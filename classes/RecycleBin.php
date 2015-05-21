@@ -18,6 +18,7 @@ namespace local_recyclebin;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
 /**
@@ -46,7 +47,45 @@ class RecycleBin
      * Restore an item from the recycle bin.
      */
     public function restore_item($item) {
-    	// TODO.
+    	global $CFG, $DB;
+
+    	// Get the pathname.
+    	$source = $CFG->dataroot . '/recyclebin/' . $item->id;
+    	if (!file_exists($source)) {
+    		throw new \moodle_exception('Invalid recycle bin item!');
+    	}
+
+    	// Use the admin user here too.
+    	$user = get_admin();
+
+    	// Context please!
+    	$ctx = \context_course::instance($this->_courseid);
+
+    	// Grab a tmpdir.
+    	$tmpdir = \restore_controller::get_tempdir_name($ctx->id, $user->id);
+
+    	// Extract the backup to tmpdir.
+    	$fb = get_file_packer('application/vnd.moodle.backup');
+    	$fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
+
+    	// Run the import.
+        $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
+        if (!$controller->execute_precheck()) {
+            $results = $controller->get_precheck_results();
+            if (isset($results['errors'])) {
+            	debugging(var_dump($results));
+                throw new \moodle_exception("Restore failed.");
+            }
+
+            if (isset($results['warnings'])) {
+            	debugging(var_dump($results['warnings']));
+            }
+        }
+
+        $controller->execute_plan();
+
+        // Cleanup.
+        $this->delete_item($item);
     }
 
     /**
