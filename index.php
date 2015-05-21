@@ -16,6 +16,8 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 
+raise_memory_limit(MEMORY_EXTRA);
+
 $courseid = required_param('course', PARAM_INT);
 $itemid = optional_param('itemid', null, PARAM_INT);
 $coursecontext = \context_course::instance($courseid, MUST_EXIST);
