@@ -75,7 +75,11 @@ if (empty($items)) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Recycle Bin');
 
-echo '<ul>';
+$table = new flexible_table('recyclebin');
+$table->define_columns(array('activity', 'restore', 'delete'));
+$table->define_headers(array('Activity', 'Restore', 'Delete'));
+$table->define_baseurl($CFG->wwwroot.'/local/recyclebin/index.php');
+$table->setup();
 
 // Cache a list of modules.
 $modules = $DB->get_records('modules');
@@ -112,13 +116,13 @@ foreach ($items as $item) {
     ));
 
     if (isset($modules[$item->module])) {
-        echo "<li>{$icon}{$item->name} {$restore} {$delete}</li>";
+        $table->add_data(array("{$icon} {$item->name}", $restore, $delete));
     } else {
-        echo "<li>(missing module!) {$item->name} {$delete}</li>";
+        $table->add_data(array($item->name, 'missing module!', $delete));
     }
 }
 
-echo '</ul>';
+$table->print_html();
 
 // Empty bin link.
 $empty = new \moodle_url('/local/recyclebin/index.php', array(
