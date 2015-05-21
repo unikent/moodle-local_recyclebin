@@ -81,9 +81,11 @@ echo '<ul>';
 $modules = $DB->get_records('modules');
 
 foreach ($items as $item) {
-    $mod = $modules[$item->module];
-
-    $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
+    $icon = '';
+    if (isset($modules[$item->module])) {
+        $mod = $modules[$item->module];
+        $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
+    }
 
     // Build restore link.
     $restore = new \moodle_url('/local/recyclebin/index.php', array(
@@ -109,7 +111,11 @@ foreach ($items as $item) {
         'title' => 'Delete'
     ));
 
-    echo "<li>{$icon}{$item->name}  {$restore} {$delete}</li>";
+    if (isset($modules[$item->module])) {
+        echo "<li>{$icon}{$item->name} {$restore} {$delete}</li>";
+    } else {
+        echo "<li>(missing module!) {$item->name} {$delete}</li>";
+    }
 }
 
 echo '</ul>';
