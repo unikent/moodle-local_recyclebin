@@ -32,14 +32,34 @@ $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
 if (isset($itemid)) {
     require_sesskey();
+    $action = required_param('action', PARAM_ALPHA);
 
     $item = $DB->get_record('local_recyclebin', array(
         'id' => $itemid
     ), '*', MUST_EXIST);
 
-    // Restore it.
-    $recyclebin->restore_item($item);
+    switch($action) {
+        case 'restore':
+            // Restore it.
+            $recyclebin->restore_item($item);
+        break;
+
+        case 'delete':
+            // Delete it.
+            $recyclebin->delete_item($item);
+        break;
+
+        default:
+            throw new \moodle_exception('Invalid action.');
+    }
+
     redirect($PAGE->url);
+} else {
+    $action = optional_param('action', NULL, PARAM_ALPHA);
+    if ($action == 'empty') {
+        require_sesskey();
+        $recyclebin->empty_recycle_bin();
+    }
 }
 
 $items = $recyclebin->get_items();
@@ -63,9 +83,11 @@ foreach ($items as $item) {
 
     $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
 
+    // Build restore link.
     $restore = new \moodle_url('/local/recyclebin/index.php', array(
         'course' => $courseid,
         'itemid' => $item->id,
+        'action' => 'restore',
         'sesskey' => sesskey()
     ));
     $restore = \html_writer::link($restore, '<i class="fa fa-history"></i>', array(
@@ -73,10 +95,33 @@ foreach ($items as $item) {
         'title' => 'Restore'
     ));
 
-    echo "<li>{$icon}{$item->name}  {$restore}</li>";
+    // Build delete link.
+    $delete = new \moodle_url('/local/recyclebin/index.php', array(
+        'course' => $courseid,
+        'itemid' => $item->id,
+        'action' => 'delete',
+        'sesskey' => sesskey()
+    ));
+    $delete = \html_writer::link($delete, '<i class="fa fa-trash"></i>', array(
+        'alt' => 'Delete',
+        'title' => 'Delete'
+    ));
+
+    echo "<li>{$icon}{$item->name}  {$restore} {$delete}</li>";
 }
 
 echo '</ul>';
+
+// Empty bin link.
+$empty = new \moodle_url('/local/recyclebin/index.php', array(
+    'course' => $courseid,
+    'action' => 'empty',
+    'sesskey' => sesskey()
+));
+echo \html_writer::link($empty, 'Empty Recycle Bin', array(
+    'alt' => 'Empty Recycle Bin',
+    'title' => 'Empty Recycle Bin'
+));
 
 // Output footer.
 echo $OUTPUT->footer();
