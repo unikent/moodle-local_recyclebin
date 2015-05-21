@@ -44,7 +44,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
         ));
 
         $node = navigation_node::create(
-            'Recycle Bin',
+            'Recycle bin',
             $url,
             navigation_node::NODETYPE_LEAF,
             'local_recyclebin',
