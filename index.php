@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once($CFG->libdir . '/tablelib.php');
 
 $courseid = required_param('course', PARAM_INT);
 $itemid = optional_param('itemid', null, PARAM_INT);
