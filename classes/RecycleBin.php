@@ -68,7 +68,7 @@ class RecycleBin
         $fb = get_file_packer('application/vnd.moodle.backup');
         $fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
 
-        // Run the import.
+        // Define the import.
         $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
@@ -82,6 +82,7 @@ class RecycleBin
             }
         }
 
+        // Run the import.
         $controller->execute_plan();
 
         // Cleanup.

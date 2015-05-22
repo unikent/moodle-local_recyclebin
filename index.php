@@ -16,8 +16,6 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 
-raise_memory_limit(MEMORY_EXTRA);
-
 $courseid = required_param('course', PARAM_INT);
 $itemid = optional_param('itemid', null, PARAM_INT);
 $coursecontext = \context_course::instance($courseid, MUST_EXIST);
@@ -32,14 +30,18 @@ $PAGE->set_title('Recycle Bin');
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
+// Do we have an itemid?
+// If so, we might have something to do!
 if (isset($itemid)) {
     require_sesskey();
+    raise_memory_limit(MEMORY_EXTRA);
     $action = required_param('action', PARAM_ALPHA);
 
     $item = $DB->get_record('local_recyclebin', array(
         'id' => $itemid
     ), '*', MUST_EXIST);
 
+    // Work out what we want to do with this item.
     switch($action) {
         case 'restore':
             // Restore it.
@@ -57,6 +59,7 @@ if (isset($itemid)) {
 
     redirect($PAGE->url);
 } else {
+    // We might want to empty the whole bin?
     $action = optional_param('action', null, PARAM_ALPHA);
     if ($action == 'empty') {
         require_sesskey();
@@ -64,6 +67,7 @@ if (isset($itemid)) {
     }
 }
 
+// Grab our items, redirect back to the course if there aren't any.
 $items = $recyclebin->get_items();
 if (empty($items)) {
     redirect(new \moodle_url('/course/view.php', array(
@@ -75,6 +79,7 @@ if (empty($items)) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Recycle Bin');
 
+// Define a table.
 $table = new flexible_table('recyclebin');
 $table->define_columns(array('activity', 'restore', 'delete'));
 $table->define_headers(array('Activity', 'Restore', 'Delete'));
@@ -84,6 +89,7 @@ $table->setup();
 // Cache a list of modules.
 $modules = $DB->get_records('modules');
 
+// Add all the items to the table.
 foreach ($items as $item) {
     $icon = '';
     if (isset($modules[$item->module])) {
@@ -122,6 +128,7 @@ foreach ($items as $item) {
     }
 }
 
+// Display the table now.
 $table->print_html();
 
 // Empty bin link.
