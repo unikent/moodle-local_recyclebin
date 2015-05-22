@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once(dirname(__FILE__) . '/../../config.php');
-
-raise_memory_limit(MEMORY_EXTRA);
+require_once($CFG->libdir . '/tablelib.php');
 
 $courseid = required_param('course', PARAM_INT);
 $itemid = optional_param('itemid', null, PARAM_INT);
@@ -32,14 +31,18 @@ $PAGE->set_title('Recycle Bin');
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
+// Do we have an itemid?
+// If so, we might have something to do!
 if (isset($itemid)) {
     require_sesskey();
+    raise_memory_limit(MEMORY_EXTRA);
     $action = required_param('action', PARAM_ALPHA);
 
     $item = $DB->get_record('local_recyclebin', array(
         'id' => $itemid
     ), '*', MUST_EXIST);
 
+    // Work out what we want to do with this item.
     switch($action) {
         case 'restore':
             // Restore it.
@@ -57,13 +60,15 @@ if (isset($itemid)) {
 
     redirect($PAGE->url);
 } else {
-    $action = optional_param('action', NULL, PARAM_ALPHA);
+    // We might want to empty the whole bin?
+    $action = optional_param('action', null, PARAM_ALPHA);
     if ($action == 'empty') {
         require_sesskey();
         $recyclebin->empty_recycle_bin();
     }
 }
 
+// Grab our items, redirect back to the course if there aren't any.
 $items = $recyclebin->get_items();
 if (empty($items)) {
     redirect(new \moodle_url('/course/view.php', array(
@@ -75,15 +80,23 @@ if (empty($items)) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Recycle Bin');
 
-echo '<ul>';
+// Define a table.
+$table = new flexible_table('recyclebin');
+$table->define_columns(array('activity', 'restore', 'delete'));
+$table->define_headers(array('Activity', 'Restore', 'Delete'));
+$table->define_baseurl($CFG->wwwroot.'/local/recyclebin/index.php');
+$table->setup();
 
 // Cache a list of modules.
 $modules = $DB->get_records('modules');
 
+// Add all the items to the table.
 foreach ($items as $item) {
-    $mod = $modules[$item->module];
-
-    $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
+    $icon = '';
+    if (isset($modules[$item->module])) {
+        $mod = $modules[$item->module];
+        $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
+    }
 
     // Build restore link.
     $restore = new \moodle_url('/local/recyclebin/index.php', array(
@@ -109,10 +122,15 @@ foreach ($items as $item) {
         'title' => 'Delete'
     ));
 
-    echo "<li>{$icon}{$item->name}  {$restore} {$delete}</li>";
+    if (isset($modules[$item->module])) {
+        $table->add_data(array("{$icon} {$item->name}", $restore, $delete));
+    } else {
+        $table->add_data(array($item->name, 'missing module!', $delete));
+    }
 }
 
-echo '</ul>';
+// Display the table now.
+$table->print_html();
 
 // Empty bin link.
 $empty = new \moodle_url('/local/recyclebin/index.php', array(
