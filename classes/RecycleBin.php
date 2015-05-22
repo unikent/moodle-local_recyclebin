@@ -28,57 +28,57 @@ class RecycleBin
 {
     private $_courseid;
 
-	public function __construct($courseid) {
-		$this->_courseid = $courseid;
-	}
+    public function __construct($courseid) {
+        $this->_courseid = $courseid;
+    }
 
-	/**
-	 * Returns a list of items in the recycle bin for this course.
-	 */
-	public function get_items() {
-		global $DB;
+    /**
+     * Returns a list of items in the recycle bin for this course.
+     */
+    public function get_items() {
+        global $DB;
 
-		return $DB->get_records('local_recyclebin', array(
-			'course' => $this->_courseid
-		));
-	}
+        return $DB->get_records('local_recyclebin', array(
+            'course' => $this->_courseid
+        ));
+    }
 
     /**
      * Restore an item from the recycle bin.
      */
     public function restore_item($item) {
-    	global $CFG, $DB;
+        global $CFG, $DB;
 
-    	// Get the pathname.
-    	$source = $CFG->dataroot . '/recyclebin/' . $item->id;
-    	if (!file_exists($source)) {
-    		throw new \moodle_exception('Invalid recycle bin item!');
-    	}
+        // Get the pathname.
+        $source = $CFG->dataroot . '/recyclebin/' . $item->id;
+        if (!file_exists($source)) {
+            throw new \moodle_exception('Invalid recycle bin item!');
+        }
 
-    	// Use the admin user here too.
-    	$user = get_admin();
+        // Use the admin user here too.
+        $user = get_admin();
 
-    	// Context please!
-    	$ctx = \context_course::instance($this->_courseid);
+        // Context please!
+        $ctx = \context_course::instance($this->_courseid);
 
-    	// Grab a tmpdir.
-    	$tmpdir = \restore_controller::get_tempdir_name($ctx->id, $user->id);
+        // Grab a tmpdir.
+        $tmpdir = \restore_controller::get_tempdir_name($ctx->id, $user->id);
 
-    	// Extract the backup to tmpdir.
-    	$fb = get_file_packer('application/vnd.moodle.backup');
-    	$fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
+        // Extract the backup to tmpdir.
+        $fb = get_file_packer('application/vnd.moodle.backup');
+        $fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
 
-    	// Run the import.
+        // Run the import.
         $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
             if (isset($results['errors'])) {
-            	debugging(var_dump($results));
+                debugging(var_dump($results));
                 throw new \moodle_exception("Restore failed.");
             }
 
             if (isset($results['warnings'])) {
-            	debugging(var_dump($results['warnings']));
+                debugging(var_dump($results['warnings']));
             }
         }
 
@@ -92,15 +92,15 @@ class RecycleBin
      * Delete an item from the recycle bin.
      */
     public function delete_item($item) {
-    	global $CFG, $DB;
+        global $CFG, $DB;
 
-    	// Delete the file.
-    	unlink($CFG->dataroot . '/recyclebin/' . $item->id);
+        // Delete the file.
+        unlink($CFG->dataroot . '/recyclebin/' . $item->id);
 
-    	// Delete the record.
-    	$DB->delete_records('local_recyclebin', array(
-			'id' => $item->id
-		));
+        // Delete the record.
+        $DB->delete_records('local_recyclebin', array(
+            'id' => $item->id
+        ));
     }
 
     /**

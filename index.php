@@ -57,7 +57,7 @@ if (isset($itemid)) {
 
     redirect($PAGE->url);
 } else {
-    $action = optional_param('action', NULL, PARAM_ALPHA);
+    $action = optional_param('action', null, PARAM_ALPHA);
     if ($action == 'empty') {
         require_sesskey();
         $recyclebin->empty_recycle_bin();
