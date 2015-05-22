@@ -37,14 +37,6 @@ class Observer
         $modinfo = get_fast_modinfo($cm->course);
         $cminfo = $modinfo->cms[$cm->id];
 
-        // Record the activity.
-        $binid = $DB->insert_record('local_recyclebin', array(
-            'course' => $cm->course,
-            'section' => $cm->section,
-            'module' => $cm->module,
-            'name' => $cminfo->name
-        ));
-
         // Backup user.
         $user = get_admin();
 
@@ -70,8 +62,23 @@ class Observer
             make_writable_directory($bindir);
         }
 
+        // Record the activity, get an ID.
+        $binid = $DB->insert_record('local_recyclebin', array(
+            'course' => $cm->course,
+            'section' => $cm->section,
+            'module' => $cm->module,
+            'name' => $cminfo->name
+        ));
+
         // Move the file to our own special little place.
-        $file->copy_content_to($bindir . '/' . $binid);
+        if (!$file->copy_content_to($bindir . '/' . $binid)) {
+            // Failed, cleanup first.
+            $DB->delete_record('local_recyclebin', array(
+                'id' => $binid
+            ));
+
+            throw new \moodle_exception("Failed to copy backup file to recyclebin.");
+        }
         $file->delete();
     }
 }
