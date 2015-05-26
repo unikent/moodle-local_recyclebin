@@ -49,7 +49,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
             navigation_node::NODETYPE_LEAF,
             'local_recyclebin',
             'local_recyclebin',
-            new pix_icon('e/cleanup_messy_code', $strfoo)
+            new pix_icon('e/cleanup_messy_code', 'Recycle bin')
         );
 
         if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
