@@ -31,6 +31,8 @@ $PAGE->set_title('Recycle Bin');
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
+$flashmessage = '';
+
 // Do we have an itemid?
 // If so, we might have something to do!
 if (isset($itemid)) {
@@ -47,13 +49,13 @@ if (isset($itemid)) {
         case 'restore':
             // Restore it.
             $recyclebin->restore_item($item);
-            \html_writer::div($item->name.' has been restored', 'bg-success');
+            $flashmessage = $OUTPUT->notification($item->name . ' has been restored');
         break;
 
         case 'delete':
             // Delete it.
-            $recyclebin->delete_item($item);
-            \html_writer::div($item->name.' has been deleted', 'bg-success');
+            \local_recyclebin\RecycleBin::delete_item($item);
+            $flashmessage = $OUTPUT->notification($item->name . ' has been deleted');
         break;
 
         default:
@@ -81,6 +83,11 @@ if (empty($items)) {
 // Output header.
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Recycle Bin');
+
+// Any flash messages?
+if (!empty($flashmessage)) {
+    echo $flashmessage;
+}
 
 // Define a table.
 $table = new flexible_table('recyclebin');
@@ -111,7 +118,7 @@ foreach ($items as $item) {
         'alt' => 'Restore',
         'title' => 'Restore'
     ));
-    
+
     $datedeleted = userdate($item->deleted);
 
     // Build delete link.

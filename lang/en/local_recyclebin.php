@@ -26,7 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Recycle Bin';
 $string['cleanrecyclebin'] = 'Clean recycle bin';
-$string['heading_title'] = 'Recycle bin expiry time';
-$string['expiry'] = 'Expiry';
-$string['expiry_desc'] = 'How long should a delete activity remianin in the recycle bin for?';
-$string['heading_desc'] = 'Configure options relating to the length of time deleted items are stored for';
+
+$string['expiry'] = 'Item lifetime';
+$string['expiry_desc'] = 'How long should a deleted activity remain in the recycle bin?';
+
+$string['neverdelete'] = 'Never delete recycled items';

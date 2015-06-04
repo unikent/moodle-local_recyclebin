@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - http://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -13,30 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Kaltura video assignment grade preferences form
- *
- * @package    local
- * @subpackage kaltura
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
-}
+defined('MOODLE_INTERNAL') || die();
 
 global $PAGE;
 
-if ($hassiteconfig) { // Thanks to Brett Wilkins <brett@catalyst.net.nz>
-
+if ($hassiteconfig) {
     $settings = new admin_settingpage('local_recyclebin', get_string('pluginname', 'local_recyclebin'));
     $ADMIN->add('localplugins', $settings);
 
-    $settings->add(new admin_setting_heading('recyclebin_heading', get_string('heading_title', 'local_recyclebin'),
-                       get_string('heading_desc', 'local_recyclebin')));
-    
-    $adminsetting = new admin_setting_configtext('expiry', get_string('expiry', 'local_recyclebin'),
-                       get_string('expiry_desc', 'local_recyclebin'), '', PARAM_TEXT);
-    $adminsetting->plugin = 'local_recyclebin';
-    $settings->add($adminsetting);
+    $settings->add(new admin_setting_configselect(
+        'local_recyclebin/expiry',
+        new lang_string('expiry', 'local_recyclebin'),
+        new lang_string('expiry_desc', 'local_recyclebin'), 0, array(
+        0    => new lang_string('neverdelete', 'local_recyclebin'),
+        1000 => new lang_string('numdays', '', 1000),
+        365  => new lang_string('numdays', '', 365),
+        180  => new lang_string('numdays', '', 180),
+        150  => new lang_string('numdays', '', 150),
+        120  => new lang_string('numdays', '', 120),
+        90   => new lang_string('numdays', '', 90),
+        60   => new lang_string('numdays', '', 60),
+        35   => new lang_string('numdays', '', 35),
+        10   => new lang_string('numdays', '', 10),
+        5    => new lang_string('numdays', '', 5),
+        2    => new lang_string('numdays', '', 2)
+    )));
 }
