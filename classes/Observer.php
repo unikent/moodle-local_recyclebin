@@ -67,7 +67,8 @@ class Observer
             'course' => $cm->course,
             'section' => $cm->section,
             'module' => $cm->module,
-            'name' => $cminfo->name
+            'name' => $cminfo->name,
+            'deleted' => time()
         ));
 
         // Move the file to our own special little place.

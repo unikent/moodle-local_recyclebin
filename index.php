@@ -47,11 +47,13 @@ if (isset($itemid)) {
         case 'restore':
             // Restore it.
             $recyclebin->restore_item($item);
+            \html_writer::div($item->name.' has been restored', 'bg-success');
         break;
 
         case 'delete':
             // Delete it.
             $recyclebin->delete_item($item);
+            \html_writer::div($item->name.' has been deleted', 'bg-success');
         break;
 
         default:
@@ -82,8 +84,8 @@ echo $OUTPUT->heading('Recycle Bin');
 
 // Define a table.
 $table = new flexible_table('recyclebin');
-$table->define_columns(array('activity', 'restore', 'delete'));
-$table->define_headers(array('Activity', 'Restore', 'Delete'));
+$table->define_columns(array('activity', 'date', 'restore', 'delete'));
+$table->define_headers(array('Activity', 'Date Deleted', 'Restore',  'Delete'));
 $table->define_baseurl($CFG->wwwroot.'/local/recyclebin/index.php');
 $table->setup();
 
@@ -109,6 +111,8 @@ foreach ($items as $item) {
         'alt' => 'Restore',
         'title' => 'Restore'
     ));
+    
+    $datedeleted = userdate($item->deleted);
 
     // Build delete link.
     $delete = new \moodle_url('/local/recyclebin/index.php', array(
@@ -123,9 +127,9 @@ foreach ($items as $item) {
     ));
 
     if (isset($modules[$item->module])) {
-        $table->add_data(array("{$icon} {$item->name}", $restore, $delete));
+        $table->add_data(array("{$icon} {$item->name}", $datedeleted, $restore, $delete));
     } else {
-        $table->add_data(array($item->name, 'missing module!', $delete));
+        $table->add_data(array($item->name, 'missing module!', $datedeleted, $delete));
     }
 }
 

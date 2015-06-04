@@ -42,6 +42,12 @@ class RecycleBin
             'course' => $this->_courseid
         ));
     }
+    
+    public static function get_expired_items($deletefrom) {
+        global $DB;
+
+        return $DB->get_records_select('local_recyclebin', 'deleted < ?', array($deletefrom));
+    }
 
     /**
      * Restore an item from the recycle bin.
@@ -92,7 +98,7 @@ class RecycleBin
     /**
      * Delete an item from the recycle bin.
      */
-    public function delete_item($item) {
+    public static function delete_item($item) {
         global $CFG, $DB;
 
         // Delete the file.
@@ -111,6 +117,13 @@ class RecycleBin
         $items = $this->get_items();
         foreach ($items as $item) {
             $this->delete_item($item);
+        }
+    }
+    
+    public static function cron_empty_recycle_bin($deletefrom) {
+        $items = self::get_expired_items($deletefrom);
+        foreach ($items as $item) {
+            self::delete_item($item);
         }
     }
 }
