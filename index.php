@@ -31,8 +31,6 @@ $PAGE->set_title('Recycle Bin');
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
-$flashmessage = '';
-
 // Do we have an itemid?
 // If so, we might have something to do!
 if (isset($itemid)) {
@@ -44,25 +42,27 @@ if (isset($itemid)) {
         'id' => $itemid
     ), '*', MUST_EXIST);
 
+    $message = '';
+
     // Work out what we want to do with this item.
     switch($action) {
         case 'restore':
             // Restore it.
             $recyclebin->restore_item($item);
-            $flashmessage = $OUTPUT->notification($item->name . ' has been restored');
+            $message = $item->name . ' has been restored';
         break;
 
         case 'delete':
             // Delete it.
             \local_recyclebin\RecycleBin::delete_item($item);
-            $flashmessage = $OUTPUT->notification($item->name . ' has been deleted');
+            $message = $item->name . ' has been deleted';
         break;
 
         default:
             throw new \moodle_exception('Invalid action.');
     }
 
-    redirect($PAGE->url);
+    redirect($PAGE->url, $message, 2);
 } else {
     // We might want to empty the whole bin?
     $action = optional_param('action', null, PARAM_ALPHA);
@@ -83,11 +83,6 @@ if (empty($items)) {
 // Output header.
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Recycle Bin');
-
-// Any flash messages?
-if (!empty($flashmessage)) {
-    echo $flashmessage;
-}
 
 // Define a table.
 $table = new flexible_table('recyclebin');
