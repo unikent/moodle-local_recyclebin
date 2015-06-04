@@ -131,7 +131,7 @@ foreach ($items as $item) {
     if (isset($modules[$item->module])) {
         $table->add_data(array("{$icon} {$item->name}", $datedeleted, $restore, $delete));
     } else {
-        $table->add_data(array($item->name, 'missing module!', $datedeleted, $delete));
+        $table->add_data(array($item->name, $datedeleted, 'missing module!', $delete));
     }
 }
 
