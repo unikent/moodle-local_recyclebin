@@ -35,7 +35,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
     $course = new \local_recyclebin\RecycleBin($PAGE->course->id);
     $items = $course->get_items();
 
-    if ($settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
+    if (!empty($items) && $settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
         $url = new moodle_url('/local/recyclebin/index.php', array(
             'course' => $context->instanceid
         ));
@@ -54,9 +54,9 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
         }
 
         $settingnode->add_node($node);
-    }
 
-    return $node;
+        return $node;
+    }
 }
 
 /**

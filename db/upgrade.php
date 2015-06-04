@@ -31,7 +31,9 @@ defined('MOODLE_INTERNAL') || die;
  * @return bool always true
  */
 function xmldb_local_recyclebin_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $DB;
+
+    $dbman = $DB->get_manager();
 
     if ($oldversion < 2015060400) {
         // Define field deleted to be added to local_recyclebin.
