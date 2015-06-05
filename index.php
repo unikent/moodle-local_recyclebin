@@ -42,23 +42,27 @@ if (isset($itemid)) {
         'id' => $itemid
     ), '*', MUST_EXIST);
 
+    $message = '';
+
     // Work out what we want to do with this item.
     switch($action) {
         case 'restore':
             // Restore it.
             $recyclebin->restore_item($item);
+            $message = $item->name . ' has been restored';
         break;
 
         case 'delete':
             // Delete it.
-            $recyclebin->delete_item($item);
+            \local_recyclebin\RecycleBin::delete_item($item);
+            $message = $item->name . ' has been deleted';
         break;
 
         default:
             throw new \moodle_exception('Invalid action.');
     }
 
-    redirect($PAGE->url);
+    redirect($PAGE->url, $message, 2);
 } else {
     // We might want to empty the whole bin?
     $action = optional_param('action', null, PARAM_ALPHA);
@@ -82,8 +86,8 @@ echo $OUTPUT->heading('Recycle Bin');
 
 // Define a table.
 $table = new flexible_table('recyclebin');
-$table->define_columns(array('activity', 'restore', 'delete'));
-$table->define_headers(array('Activity', 'Restore', 'Delete'));
+$table->define_columns(array('activity', 'date', 'restore', 'delete'));
+$table->define_headers(array('Activity', 'Date Deleted', 'Restore',  'Delete'));
 $table->define_baseurl($CFG->wwwroot.'/local/recyclebin/index.php');
 $table->setup();
 
@@ -110,6 +114,8 @@ foreach ($items as $item) {
         'title' => 'Restore'
     ));
 
+    $datedeleted = userdate($item->deleted);
+
     // Build delete link.
     $delete = new \moodle_url('/local/recyclebin/index.php', array(
         'course' => $courseid,
@@ -123,9 +129,9 @@ foreach ($items as $item) {
     ));
 
     if (isset($modules[$item->module])) {
-        $table->add_data(array("{$icon} {$item->name}", $restore, $delete));
+        $table->add_data(array("{$icon} {$item->name}", $datedeleted, $restore, $delete));
     } else {
-        $table->add_data(array($item->name, 'missing module!', $delete));
+        $table->add_data(array($item->name, $datedeleted, 'missing module!', $delete));
     }
 }
 

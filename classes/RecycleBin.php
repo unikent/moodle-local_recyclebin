@@ -86,13 +86,13 @@ class RecycleBin
         $controller->execute_plan();
 
         // Cleanup.
-        $this->delete_item($item);
+        static::delete_item($item);
     }
 
     /**
      * Delete an item from the recycle bin.
      */
-    public function delete_item($item) {
+    public static function delete_item($item) {
         global $CFG, $DB;
 
         // Delete the file.
@@ -110,7 +110,7 @@ class RecycleBin
     public function empty_recycle_bin() {
         $items = $this->get_items();
         foreach ($items as $item) {
-            $this->delete_item($item);
+            static::delete_item($item);
         }
     }
 }
