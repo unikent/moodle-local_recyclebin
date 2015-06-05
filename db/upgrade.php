@@ -54,7 +54,7 @@ function xmldb_local_recyclebin_upgrade($oldversion) {
             $dbman->add_index($table, $index);
         }
 
-        upgrade_plugin_savepoint(true, 2015060400, 'local', 'catman');
+        upgrade_plugin_savepoint(true, 2015060400, 'local', 'recyclebin');
     }
 
     return true;
