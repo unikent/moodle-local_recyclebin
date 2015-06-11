@@ -18,7 +18,7 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 $courseid = required_param('course', PARAM_INT);
-$itemid = optional_param('itemid', null, PARAM_INT);
+$action = optional_param('action', null, PARAM_ALPHA);
 $coursecontext = \context_course::instance($courseid, MUST_EXIST);
 
 require_login($courseid);
@@ -31,51 +31,42 @@ $PAGE->set_title('Recycle Bin');
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
-// Do we have an itemid?
-// If so, we might have something to do!
-if (isset($itemid)) {
-    require_sesskey();
+// If we are doing anything, we need a sesskey!
+if (!empty($action)) {
     raise_memory_limit(MEMORY_EXTRA);
-    $action = required_param('action', PARAM_ALPHA);
+    require_sesskey();
 
-    $item = $DB->get_record('local_recyclebin', array(
-        'id' => $itemid
-    ), '*', MUST_EXIST);
-
-    $message = '';
-
-    // Work out what we want to do with this item.
-    switch($action) {
-        case 'restore':
-            require_capability('local/recyclebin:restore', $coursecontext);
-
-            // Restore it.
-            $recyclebin->restore_item($item);
-            $message = $item->name . ' has been restored';
-        break;
-
-        case 'delete':
-            require_capability('local/recyclebin:delete', $coursecontext);
-
-            // Delete it.
-            \local_recyclebin\RecycleBin::delete_item($item);
-            $message = $item->name . ' has been deleted';
-        break;
-
-        default:
-            throw new \moodle_exception('Invalid action.');
+    $item = null;
+    if ($action == 'restore' || $action == 'delete') {
+        $itemid = required_param('itemid', PARAM_INT);
+        $item = $DB->get_record('local_recyclebin', array(
+            'id' => $itemid
+        ), '*', MUST_EXIST);
     }
 
-    redirect($PAGE->url, $message, 2);
-} else {
-    // We might want to empty the whole bin?
-    $action = optional_param('action', null, PARAM_ALPHA);
-    if ($action == 'empty') {
-        require_capability('local/recyclebin:empty', $coursecontext);
-        require_sesskey();
+    switch ($action) {
+        // Restore it.
+        case 'restore':
+            require_capability('local/recyclebin:restore', $coursecontext);
+            $recyclebin->restore_item($item);
+            redirect($PAGE->url, "{$item->name} has been restored", 2);
+        break;
+
+        // Delete it.
+        case 'delete':
+            require_capability('local/recyclebin:delete', $coursecontext);
+            \local_recyclebin\RecycleBin::delete_item($item);
+            redirect($PAGE->url, "{$item->name} has been deleted", 2);
+        break;
 
         // Empty it.
-        $recyclebin->empty_recycle_bin();
+        case 'empty':
+            require_capability('local/recyclebin:empty', $coursecontext);
+            $recyclebin->empty_recycle_bin();
+            redirect(new \moodle_url('/course/view.php', array(
+                'id' => $courseid
+            )), "Recycle bin has been emptied", 2);
+        break;
     }
 }
 
