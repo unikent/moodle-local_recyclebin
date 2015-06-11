@@ -31,3 +31,8 @@ $string['expiry'] = 'Item lifetime';
 $string['expiry_desc'] = 'How long should a deleted activity remain in the recycle bin?';
 
 $string['neverdelete'] = 'Never delete recycled items';
+
+$string['recyclebin:view'] = 'View recycle bin items';
+$string['recyclebin:restore'] = 'Restore recycle bin items';
+$string['recyclebin:delete'] = 'Delete recycle bin items';
+$string['recyclebin:empty'] = 'Empty recycle bins';

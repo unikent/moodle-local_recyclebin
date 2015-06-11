@@ -72,6 +72,7 @@ class RecycleBin
         $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
+
             if (isset($results['errors'])) {
                 debugging(var_dump($results));
                 throw new \moodle_exception("Restore failed.");

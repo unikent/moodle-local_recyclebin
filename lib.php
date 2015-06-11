@@ -34,7 +34,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
 
     // Check we can update the course.
     $context = \context_course::instance($PAGE->course->id);
-    if (!has_capability('moodle/course:update', $context)) {
+    if (!has_capability('local/recyclebin:view', $context)) {
         return;
     }
 
