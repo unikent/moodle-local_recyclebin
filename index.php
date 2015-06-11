@@ -92,7 +92,7 @@ $headers = array('Activity', 'Date Deleted');
 
 if ($canrestore) {
     $columns[] = 'restore';
-    $headers[] = 'delete';
+    $headers[] = 'Restore';
 }
 
 if ($candelete) {
