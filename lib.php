@@ -32,6 +32,12 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
         return;
     }
 
+    // Check we can view the recycle bin.
+    $context = \context_course::instance($PAGE->course->id);
+    if (!has_capability('local/recyclebin:view', $context)) {
+        return;
+    }
+
     $course = new \local_recyclebin\RecycleBin($PAGE->course->id);
     $items = $course->get_items();
 

@@ -18,11 +18,11 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
 
 $courseid = required_param('course', PARAM_INT);
-$itemid = optional_param('itemid', null, PARAM_INT);
+$action = optional_param('action', null, PARAM_ALPHA);
 $coursecontext = \context_course::instance($courseid, MUST_EXIST);
 
 require_login($courseid);
-require_capability('moodle/course:update', $coursecontext);
+require_capability('local/recyclebin:view', $coursecontext);
 
 $PAGE->set_url('/local/recyclebin/index.php', array(
     'course' => $courseid
@@ -31,44 +31,42 @@ $PAGE->set_title('Recycle Bin');
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
-// Do we have an itemid?
-// If so, we might have something to do!
-if (isset($itemid)) {
-    require_sesskey();
+// If we are doing anything, we need a sesskey!
+if (!empty($action)) {
     raise_memory_limit(MEMORY_EXTRA);
-    $action = required_param('action', PARAM_ALPHA);
+    require_sesskey();
 
-    $item = $DB->get_record('local_recyclebin', array(
-        'id' => $itemid
-    ), '*', MUST_EXIST);
-
-    $message = '';
-
-    // Work out what we want to do with this item.
-    switch($action) {
-        case 'restore':
-            // Restore it.
-            $recyclebin->restore_item($item);
-            $message = $item->name . ' has been restored';
-        break;
-
-        case 'delete':
-            // Delete it.
-            \local_recyclebin\RecycleBin::delete_item($item);
-            $message = $item->name . ' has been deleted';
-        break;
-
-        default:
-            throw new \moodle_exception('Invalid action.');
+    $item = null;
+    if ($action == 'restore' || $action == 'delete') {
+        $itemid = required_param('itemid', PARAM_INT);
+        $item = $DB->get_record('local_recyclebin', array(
+            'id' => $itemid
+        ), '*', MUST_EXIST);
     }
 
-    redirect($PAGE->url, $message, 2);
-} else {
-    // We might want to empty the whole bin?
-    $action = optional_param('action', null, PARAM_ALPHA);
-    if ($action == 'empty') {
-        require_sesskey();
-        $recyclebin->empty_recycle_bin();
+    switch ($action) {
+        // Restore it.
+        case 'restore':
+            require_capability('local/recyclebin:restore', $coursecontext);
+            $recyclebin->restore_item($item);
+            redirect($PAGE->url, "{$item->name} has been restored", 2);
+        break;
+
+        // Delete it.
+        case 'delete':
+            require_capability('local/recyclebin:delete', $coursecontext);
+            \local_recyclebin\RecycleBin::delete_item($item);
+            redirect($PAGE->url, "{$item->name} has been deleted", 2);
+        break;
+
+        // Empty it.
+        case 'empty':
+            require_capability('local/recyclebin:empty', $coursecontext);
+            $recyclebin->empty_recycle_bin();
+            redirect(new \moodle_url('/course/view.php', array(
+                'id' => $courseid
+            )), "Recycle bin has been emptied", 2);
+        break;
     }
 }
 
@@ -84,10 +82,29 @@ if (empty($items)) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading('Recycle Bin');
 
+// Check permissions.
+$canrestore = has_capability('local/recyclebin:restore', $coursecontext);
+$candelete = has_capability('local/recyclebin:delete', $coursecontext);
+
+// Define columns and headers.
+$columns = array('activity', 'date');
+$headers = array('Activity', 'Date Deleted');
+
+if ($canrestore) {
+    $columns[] = 'restore';
+    $headers[] = 'Restore';
+}
+
+if ($candelete) {
+    $columns[] = 'delete';
+    $headers[] = 'Delete';
+}
+
+
 // Define a table.
 $table = new flexible_table('recyclebin');
-$table->define_columns(array('activity', 'date', 'restore', 'delete'));
-$table->define_headers(array('Activity', 'Date Deleted', 'Restore',  'Delete'));
+$table->define_columns($columns);
+$table->define_headers($headers);
 $table->define_baseurl($CFG->wwwroot.'/local/recyclebin/index.php');
 $table->setup();
 
@@ -96,58 +113,71 @@ $modules = $DB->get_records('modules');
 
 // Add all the items to the table.
 foreach ($items as $item) {
+    $row = array();
+
+    // Build item name.
     $icon = '';
     if (isset($modules[$item->module])) {
         $mod = $modules[$item->module];
         $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
     }
 
-    // Build restore link.
-    $restore = new \moodle_url('/local/recyclebin/index.php', array(
-        'course' => $courseid,
-        'itemid' => $item->id,
-        'action' => 'restore',
-        'sesskey' => sesskey()
-    ));
-    $restore = \html_writer::link($restore, '<i class="fa fa-history"></i>', array(
-        'alt' => 'Restore',
-        'title' => 'Restore'
-    ));
+    $row[] = "{$icon}{$item->name}";
+    $row[] = userdate($item->deleted);
 
-    $datedeleted = userdate($item->deleted);
+    // Build restore link.
+    if ($canrestore) {
+        $restore = 'missing module!';
+        if (isset($modules[$item->module])) {
+            $restore = new \moodle_url('/local/recyclebin/index.php', array(
+                'course' => $courseid,
+                'itemid' => $item->id,
+                'action' => 'restore',
+                'sesskey' => sesskey()
+            ));
+            $restore = \html_writer::link($restore, '<i class="fa fa-history"></i>', array(
+                'alt' => 'Restore',
+                'title' => 'Restore'
+            ));
+        }
+
+        $row[] = $restore;
+    }
 
     // Build delete link.
-    $delete = new \moodle_url('/local/recyclebin/index.php', array(
-        'course' => $courseid,
-        'itemid' => $item->id,
-        'action' => 'delete',
-        'sesskey' => sesskey()
-    ));
-    $delete = \html_writer::link($delete, '<i class="fa fa-trash"></i>', array(
-        'alt' => 'Delete',
-        'title' => 'Delete'
-    ));
+    if ($candelete) {
+        $delete = new \moodle_url('/local/recyclebin/index.php', array(
+            'course' => $courseid,
+            'itemid' => $item->id,
+            'action' => 'delete',
+            'sesskey' => sesskey()
+        ));
+        $delete = \html_writer::link($delete, '<i class="fa fa-trash"></i>', array(
+            'alt' => 'Delete',
+            'title' => 'Delete'
+        ));
 
-    if (isset($modules[$item->module])) {
-        $table->add_data(array("{$icon} {$item->name}", $datedeleted, $restore, $delete));
-    } else {
-        $table->add_data(array($item->name, $datedeleted, 'missing module!', $delete));
+        $row[] = $delete;
     }
+
+    $table->add_data($row);
 }
 
 // Display the table now.
 $table->print_html();
 
-// Empty bin link.
-$empty = new \moodle_url('/local/recyclebin/index.php', array(
-    'course' => $courseid,
-    'action' => 'empty',
-    'sesskey' => sesskey()
-));
-echo \html_writer::link($empty, 'Empty Recycle Bin', array(
-    'alt' => 'Empty Recycle Bin',
-    'title' => 'Empty Recycle Bin'
-));
+if (has_capability('local/recyclebin:empty', $coursecontext)) {
+    // Empty bin link.
+    $empty = new \moodle_url('/local/recyclebin/index.php', array(
+        'course' => $courseid,
+        'action' => 'empty',
+        'sesskey' => sesskey()
+    ));
+    echo \html_writer::link($empty, 'Empty Recycle Bin', array(
+        'alt' => 'Empty Recycle Bin',
+        'title' => 'Empty Recycle Bin'
+    ));
+}
 
 // Output footer.
 echo $OUTPUT->footer();
