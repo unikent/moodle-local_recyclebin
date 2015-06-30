@@ -47,6 +47,8 @@ class item_restored extends \core\event\base
      * @return string
      */
     public function get_description() {
-        return get_string('event_restored_description', 'local_recyclebin');
+        return get_string('event_restored_description', 'local_recyclebin', array(
+            'objectid' => $this->objectid
+        ));
     }
 }
