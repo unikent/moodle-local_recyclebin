@@ -47,17 +47,14 @@ class RecycleBin
      * Store a course module in the recycle bin.
      */
     public function store_item($cm) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
 
         // Get more information.
         $modinfo = get_fast_modinfo($cm->course);
         $cminfo = $modinfo->cms[$cm->id];
 
-        // Backup user.
-        $user = get_admin();
-
         // Backup the activity.
-        $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id);
+        $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id);
         $controller->execute_plan();
 
         // Grab the result.
@@ -110,7 +107,7 @@ class RecycleBin
      * Restore an item from the recycle bin.
      */
     public function restore_item($item) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
 
         // Get the pathname.
         $source = $CFG->dataroot . '/recyclebin/' . $item->id;
@@ -118,21 +115,18 @@ class RecycleBin
             throw new \moodle_exception('Invalid recycle bin item!');
         }
 
-        // Use the admin user here too.
-        $user = get_admin();
-
         // Grab the course context.
         $context = \context_course::instance($this->_courseid);
 
         // Grab a tmpdir.
-        $tmpdir = \restore_controller::get_tempdir_name($context->id, $user->id);
+        $tmpdir = \restore_controller::get_tempdir_name($context->id, $USER->id);
 
         // Extract the backup to tmpdir.
         $fb = get_file_packer('application/vnd.moodle.backup');
         $fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
 
         // Define the import.
-        $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
+        $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id, \backup::TARGET_EXISTING_ADDING);
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
 
