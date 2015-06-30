@@ -44,6 +44,69 @@ class RecycleBin
     }
 
     /**
+     * Store a course module in the recycle bin.
+     */
+    public function store_item($cm) {
+        global $CFG, $DB;
+
+        // Get more information.
+        $modinfo = get_fast_modinfo($cm->course);
+        $cminfo = $modinfo->cms[$cm->id];
+
+        // Backup user.
+        $user = get_admin();
+
+        // Backup the activity.
+        $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id);
+        $controller->execute_plan();
+
+        // Grab the result.
+        $result = $controller->get_results();
+        if (!isset($result['backup_destination'])) {
+            throw new \moodle_exception('Failed to backup activity prior to deletion.');
+        }
+
+        // Grab the filename.
+        $file = $result['backup_destination'];
+        if (!$file->get_contenthash()) {
+            throw new \moodle_exception('Failed to backup activity prior to deletion (invalid file).');
+        }
+
+        // Make sure our backup dir exists.
+        $bindir = $CFG->dataroot . '/recyclebin';
+        if (!file_exists($bindir)) {
+            make_writable_directory($bindir);
+        }
+
+        // Record the activity, get an ID.
+        $binid = $DB->insert_record('local_recyclebin', array(
+            'course' => $cm->course,
+            'section' => $cm->section,
+            'module' => $cm->module,
+            'name' => $cminfo->name,
+            'deleted' => time()
+        ));
+
+        // Move the file to our own special little place.
+        if (!$file->copy_content_to($bindir . '/' . $binid)) {
+            // Failed, cleanup first.
+            $DB->delete_record('local_recyclebin', array(
+                'id' => $binid
+            ));
+
+            throw new \moodle_exception("Failed to copy backup file to recyclebin.");
+        }
+        $file->delete();
+
+        // Fire event.
+        $event = \local_recyclebin\event\item_stored::create(array(
+            'objectid' => $binid,
+            'context' => \context_course::instance($cm->course)
+        ));
+        $event->trigger();
+    }
+
+    /**
      * Restore an item from the recycle bin.
      */
     public function restore_item($item) {

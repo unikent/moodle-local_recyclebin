@@ -16,27 +16,32 @@
 
 namespace local_recyclebin\task;
 
+/**
+ * This task deleted expired recyclebin items.
+ */
 class clean_recyclebin extends \core\task\scheduled_task {
+    /**
+     * Task name.
+     */
     public function get_name() {
         return get_string('cleanrecyclebin', 'local_recyclebin');
     }
 
+    /**
+     * Delete all expired items.
+     */
     public function execute() {
-        global $CFG, $DB;
-
-        require_once($CFG->dirroot . '/course/lib.php');
+        global $DB;
 
         $lifetime = get_config('local_recyclebin', 'expiry');
         if ($lifetime == 0) {
-            // Effectively disabled.
             return true;
         }
 
         $deletefrom = time() - (86400 * $lifetime);
-
         $items = $DB->get_recordset_select('local_recyclebin', 'deleted < ?', array($deletefrom), '', 'id');
         foreach ($items as $item) {
-            echo "[RecycleBin] Deleting item {$item->id}...\n";
+            mtrace("[RecycleBin] Deleting item {$item->id}...\n");
 
             $bin = new \local_recyclebin\RecycleBin($item->course);
             $bin->delete_item($item);
