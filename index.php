@@ -27,7 +27,7 @@ require_capability('local/recyclebin:view', $coursecontext);
 $PAGE->set_url('/local/recyclebin/index.php', array(
     'course' => $courseid
 ));
-$PAGE->set_title('Recycle Bin');
+$PAGE->set_title(get_string('pluginname', 'local_recyclebin'));
 
 $recyclebin = new \local_recyclebin\RecycleBin($courseid);
 
@@ -49,14 +49,14 @@ if (!empty($action)) {
         case 'restore':
             require_capability('local/recyclebin:restore', $coursecontext);
             $recyclebin->restore_item($item);
-            redirect($PAGE->url, "{$item->name} has been restored", 2);
+            redirect($PAGE->url, get_string('alertrestored', 'local_recyclebin', $item), 2);
         break;
 
         // Delete it.
         case 'delete':
             require_capability('local/recyclebin:delete', $coursecontext);
             \local_recyclebin\RecycleBin::delete_item($item);
-            redirect($PAGE->url, "{$item->name} has been deleted", 2);
+            redirect($PAGE->url, get_string('alertdeleted', 'local_recyclebin', $item), 2);
         break;
 
         // Empty it.
@@ -65,7 +65,7 @@ if (!empty($action)) {
             $recyclebin->empty_recycle_bin();
             redirect(new \moodle_url('/course/view.php', array(
                 'id' => $courseid
-            )), "Recycle bin has been emptied", 2);
+            )), get_string('alertemptied', 'local_recyclebin'), 2);
         break;
     }
 }
@@ -80,24 +80,31 @@ if (empty($items)) {
 
 // Output header.
 echo $OUTPUT->header();
-echo $OUTPUT->heading('Recycle Bin');
+echo $OUTPUT->heading($PAGE->title);
 
 // Check permissions.
 $canrestore = has_capability('local/recyclebin:restore', $coursecontext);
 $candelete = has_capability('local/recyclebin:delete', $coursecontext);
 
+// Strings.
+$restorestr = get_string('restore');
+$deletestr = get_string('delete');
+
 // Define columns and headers.
 $columns = array('activity', 'date');
-$headers = array('Activity', 'Date Deleted');
+$headers = array(
+    get_string('activity'),
+    get_string('deleted', 'local_recyclebin')
+);
 
 if ($canrestore) {
     $columns[] = 'restore';
-    $headers[] = 'Restore';
+    $headers[] = $restorestr;
 }
 
 if ($candelete) {
     $columns[] = 'delete';
-    $headers[] = 'Delete';
+    $headers[] = $deletestr;
 }
 
 
@@ -105,7 +112,7 @@ if ($candelete) {
 $table = new flexible_table('recyclebin');
 $table->define_columns($columns);
 $table->define_headers($headers);
-$table->define_baseurl($CFG->wwwroot.'/local/recyclebin/index.php');
+$table->define_baseurl($PAGE->url);
 $table->setup();
 
 // Cache a list of modules.
@@ -127,7 +134,7 @@ foreach ($items as $item) {
 
     // Build restore link.
     if ($canrestore) {
-        $restore = 'missing module!';
+        $restore = '';
         if (isset($modules[$item->module])) {
             $restore = new \moodle_url('/local/recyclebin/index.php', array(
                 'course' => $courseid,
@@ -136,8 +143,7 @@ foreach ($items as $item) {
                 'sesskey' => sesskey()
             ));
             $restore = \html_writer::link($restore, '<i class="fa fa-history"></i>', array(
-                'alt' => 'Restore',
-                'title' => 'Restore'
+                'alt' => $restorestr
             ));
         }
 
@@ -153,8 +159,7 @@ foreach ($items as $item) {
             'sesskey' => sesskey()
         ));
         $delete = \html_writer::link($delete, '<i class="fa fa-trash"></i>', array(
-            'alt' => 'Delete',
-            'title' => 'Delete'
+            'alt' => $deletestr
         ));
 
         $row[] = $delete;
@@ -166,17 +171,15 @@ foreach ($items as $item) {
 // Display the table now.
 $table->print_html();
 
+// Empty recyclebin link.
 if (has_capability('local/recyclebin:empty', $coursecontext)) {
-    // Empty bin link.
     $empty = new \moodle_url('/local/recyclebin/index.php', array(
         'course' => $courseid,
         'action' => 'empty',
         'sesskey' => sesskey()
     ));
-    echo \html_writer::link($empty, 'Empty Recycle Bin', array(
-        'alt' => 'Empty Recycle Bin',
-        'title' => 'Empty Recycle Bin'
-    ));
+
+    echo \html_writer::link($empty, get_string('empty', 'local_recyclebin'));
 }
 
 // Output footer.
