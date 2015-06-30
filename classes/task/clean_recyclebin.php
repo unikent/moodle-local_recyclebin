@@ -38,7 +38,8 @@ class clean_recyclebin extends \core\task\scheduled_task {
         foreach ($items as $item) {
             echo "[RecycleBin] Deleting item {$item->id}...\n";
 
-            \local_recyclebin\RecycleBin::delete_item($item);
+            $bin = new \local_recyclebin\RecycleBin($item->course);
+            $bin->delete_item($item);
         }
         $items->close();
 

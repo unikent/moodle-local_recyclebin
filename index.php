@@ -55,7 +55,7 @@ if (!empty($action)) {
         // Delete it.
         case 'delete':
             require_capability('local/recyclebin:delete', $coursecontext);
-            \local_recyclebin\RecycleBin::delete_item($item);
+            $recyclebin->delete_item($item);
             redirect($PAGE->url, get_string('alertdeleted', 'local_recyclebin', $item), 2);
         break;
 

@@ -27,6 +27,8 @@ class Observer
 {
     /**
      * Main hook.
+     * Note: This is not actually a typical observer.
+     * There is no pre-cm event, see README.
      *
      * @param \stdClass $cm The course module record.
      */
@@ -81,5 +83,12 @@ class Observer
             throw new \moodle_exception("Failed to copy backup file to recyclebin.");
         }
         $file->delete();
+
+        // Fire event.
+        $event = \local_recyclebin\event\item_stored::create(array(
+            'objectid' => $binid,
+            'context' => \context_course::instance($cm->course)
+        ));
+        $event->trigger();
     }
 }

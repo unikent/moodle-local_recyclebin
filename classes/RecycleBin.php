@@ -58,11 +58,11 @@ class RecycleBin
         // Use the admin user here too.
         $user = get_admin();
 
-        // Context please!
-        $ctx = \context_course::instance($this->_courseid);
+        // Grab the course context.
+        $context = \context_course::instance($this->_courseid);
 
         // Grab a tmpdir.
-        $tmpdir = \restore_controller::get_tempdir_name($ctx->id, $user->id);
+        $tmpdir = \restore_controller::get_tempdir_name($context->id, $user->id);
 
         // Extract the backup to tmpdir.
         $fb = get_file_packer('application/vnd.moodle.backup');
@@ -86,14 +86,49 @@ class RecycleBin
         // Run the import.
         $controller->execute_plan();
 
+        // Fire event.
+        $event = \local_recyclebin\event\item_restored::create(array(
+            'objectid' => $item->id,
+            'context' => $context
+        ));
+        $event->add_record_snapshot('local_recyclebin', $item);
+        $event->trigger();
+
         // Cleanup.
-        static::delete_item($item);
+        $this->cleanup_item($item);
     }
 
     /**
      * Delete an item from the recycle bin.
      */
-    public static function delete_item($item) {
+    public function delete_item($item) {
+        // Do the cleanup.
+        $this->cleanup_item($item);
+
+        // Fire event.
+        $event = \local_recyclebin\event\item_purged::create(array(
+            'objectid' => $item->id,
+            'context' => \context_course::instance($item->course)
+        ));
+        $event->add_record_snapshot('local_recyclebin', $item);
+        $event->trigger();
+    }
+
+    /**
+     * Empty the recycle bin.
+     */
+    public function empty_recycle_bin() {
+        // Cleanup all items.
+        $items = $this->get_items();
+        foreach ($items as $item) {
+            $this->delete_item($item);
+        }
+    }
+
+    /**
+     * Delete an item from the recycle bin.
+     */
+    private function cleanup_item($item) {
         global $CFG, $DB;
 
         // Delete the file.
@@ -103,15 +138,5 @@ class RecycleBin
         $DB->delete_records('local_recyclebin', array(
             'id' => $item->id
         ));
-    }
-
-    /**
-     * Empty the recycle bin.
-     */
-    public function empty_recycle_bin() {
-        $items = $this->get_items();
-        foreach ($items as $item) {
-            static::delete_item($item);
-        }
     }
 }
