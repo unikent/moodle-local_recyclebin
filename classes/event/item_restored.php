@@ -14,24 +14,41 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_recyclebin;
+namespace local_recyclebin\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Main class for the recycle bin.
+ * Event Class
  */
-class Observer
+class item_restored extends \core\event\base
 {
     /**
-     * Main hook.
-     * Note: This is not actually a typical observer.
-     * There is no pre-cm event, see README.
-     *
-     * @param \stdClass $cm The course module record.
+     * Init method.
      */
-    public static function pre_cm_delete($cm) {
-        $recyclebin = new \local_recyclebin\RecycleBin($cm->course);
-        $recyclebin->store_item($cm);
+    protected function init() {
+        $this->data['objecttable'] = 'local_recyclebin';
+        $this->data['crud'] = 'u';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
+
+    /**
+     * Returns localised general event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('event_restored_name', 'local_recyclebin');
+    }
+
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return get_string('event_restored_description', 'local_recyclebin', array(
+            'objectid' => $this->objectid
+        ));
     }
 }

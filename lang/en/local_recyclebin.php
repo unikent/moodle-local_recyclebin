@@ -24,15 +24,29 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Recycle Bin';
+$string['pluginname'] = 'Recycle bin';
 $string['cleanrecyclebin'] = 'Clean recycle bin';
 
 $string['expiry'] = 'Item lifetime';
 $string['expiry_desc'] = 'How long should a deleted activity remain in the recycle bin?';
 
 $string['neverdelete'] = 'Never delete recycled items';
+$string['deleted'] = 'Date deleted';
+$string['empty'] = 'Empty recycle bin';
 
 $string['recyclebin:view'] = 'View recycle bin items';
 $string['recyclebin:restore'] = 'Restore recycle bin items';
 $string['recyclebin:delete'] = 'Delete recycle bin items';
 $string['recyclebin:empty'] = 'Empty recycle bins';
+
+$string['alertrestored'] = '{$a->name} has been restored';
+$string['alertdeleted'] = '{$a->name} has been deleted';
+$string['alertemptied'] = 'Recycle bin has been emptied';
+
+$string['event_stored_name'] = 'Item stored';
+$string['event_restored_name'] = 'Item restored';
+$string['event_purged_name'] = 'Item purged';
+
+$string['event_stored_description'] = 'Item stored with ID {$a->objectid}.';
+$string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
+$string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
