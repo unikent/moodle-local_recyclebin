@@ -45,6 +45,10 @@ class RecycleBin
 
     /**
      * Store a course module in the recycle bin.
+     * @param $cm
+     * @throws \coding_exception
+     * @throws \invalid_dataroot_permissions
+     * @throws \moodle_exception
      */
     public function store_item($cm) {
         global $CFG, $DB, $USER;
@@ -105,9 +109,14 @@ class RecycleBin
 
     /**
      * Restore an item from the recycle bin.
+     * @param $item
+     * @throws \Exception
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     * @throws \restore_controller_exception
      */
     public function restore_item($item) {
-        global $CFG, $DB, $USER;
+        global $CFG, $USER;
 
         // Get the pathname.
         $source = $CFG->dataroot . '/recyclebin/' . $item->id;
@@ -131,12 +140,12 @@ class RecycleBin
             $results = $controller->get_precheck_results();
 
             if (isset($results['errors'])) {
-                debugging(var_dump($results));
+                debugging(var_export($results, true));
                 throw new \moodle_exception("Restore failed.");
             }
 
             if (isset($results['warnings'])) {
-                debugging(var_dump($results['warnings']));
+                debugging(var_export($results['warnings'], true));
             }
         }
 
@@ -157,6 +166,8 @@ class RecycleBin
 
     /**
      * Delete an item from the recycle bin.
+     * @param $item
+     * @throws \coding_exception
      */
     public function delete_item($item) {
         // Do the cleanup.
@@ -184,6 +195,7 @@ class RecycleBin
 
     /**
      * Delete an item from the recycle bin.
+     * @param $item
      */
     private function cleanup_item($item) {
         global $CFG, $DB;

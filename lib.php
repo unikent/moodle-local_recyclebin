@@ -29,13 +29,13 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
 
     // Only add this settings item on non-site course pages.
     if (!$PAGE->course or $PAGE->course->id == 1) {
-        return;
+        return null;
     }
 
     // Check we can view the recycle bin.
     $context = \context_course::instance($PAGE->course->id);
     if (!has_capability('local/recyclebin:view', $context)) {
-        return;
+        return null;
     }
 
     $course = new \local_recyclebin\RecycleBin($PAGE->course->id);
