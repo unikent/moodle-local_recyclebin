@@ -113,6 +113,7 @@ $table = new flexible_table('recyclebin');
 $table->define_columns($columns);
 $table->define_headers($headers);
 $table->define_baseurl($PAGE->url);
+$table->set_attribute('id', 'recycle-bin-table');
 $table->setup();
 
 // Cache a list of modules.
