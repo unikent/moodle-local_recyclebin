@@ -57,6 +57,11 @@ class RecycleBin
         $modinfo = get_fast_modinfo($cm->course);
         $cminfo = $modinfo->cms[$cm->id];
 
+        // Check backup/restore support.
+        if (!plugin_supports('mod', $cminfo->modname , FEATURE_BACKUP_MOODLE2)) {
+            return;
+        }
+
         // Backup the activity.
         $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id);
         $controller->execute_plan();
