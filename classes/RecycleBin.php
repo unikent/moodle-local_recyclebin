@@ -18,9 +18,6 @@ namespace local_recyclebin;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
-require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
-
 /**
  * RecycleBin class.
  */
@@ -52,6 +49,8 @@ class RecycleBin
      */
     public function store_item($cm) {
         global $CFG, $DB, $USER;
+
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
         // Get more information.
         $modinfo = get_fast_modinfo($cm->course);
@@ -122,6 +121,8 @@ class RecycleBin
      */
     public function restore_item($item) {
         global $CFG, $USER;
+
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
         // Get the pathname.
         $source = $CFG->dataroot . '/recyclebin/' . $item->id;
