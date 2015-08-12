@@ -38,10 +38,18 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
         return null;
     }
 
-    $course = new \local_recyclebin\RecycleBin($PAGE->course->id);
-    $items = $course->get_items();
+    // If we are set to auto-hide, check the number of items.
+    $autohide = get_config('local_recyclebin', 'autohide');
+    if ($autohide) {
+        $course = new \local_recyclebin\RecycleBin($PAGE->course->id);
+        $items = $course->get_items();
+        if (empty($items)) {
+            return null;
+        }
+    }
 
-    if (!empty($items) && $settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
+    // Add the recyclebin link.
+    if ($settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
         $url = new moodle_url('/local/recyclebin/index.php', array(
             'course' => $context->instanceid
         ));

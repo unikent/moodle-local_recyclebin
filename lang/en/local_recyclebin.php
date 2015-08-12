@@ -30,6 +30,9 @@ $string['cleanrecyclebin'] = 'Clean recycle bin';
 $string['expiry'] = 'Item lifetime';
 $string['expiry_desc'] = 'How long should a deleted activity remain in the recycle bin?';
 
+$string['autohide'] = 'Auto hide?';
+$string['autohide_desc'] = 'Automatically hides the recycle bin link when the bin is empty.';
+
 $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
 $string['empty'] = 'Empty recycle bin';
