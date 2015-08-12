@@ -48,7 +48,7 @@ class RecycleBin
      * @throws \moodle_exception
      */
     public function store_item($cm) {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB;
 
         require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 
@@ -62,7 +62,8 @@ class RecycleBin
         }
 
         // Backup the activity.
-        $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id);
+        $user = get_admin();
+        $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id);
         $controller->execute_plan();
 
         // Grab the result.
@@ -120,9 +121,11 @@ class RecycleBin
      * @throws \restore_controller_exception
      */
     public function restore_item($item) {
-        global $CFG, $USER;
+        global $CFG;
 
         require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+
+        $user = get_admin();
 
         // Get the pathname.
         $source = $CFG->dataroot . '/recyclebin/' . $item->id;
@@ -134,14 +137,14 @@ class RecycleBin
         $context = \context_course::instance($this->_courseid);
 
         // Grab a tmpdir.
-        $tmpdir = \restore_controller::get_tempdir_name($context->id, $USER->id);
+        $tmpdir = \restore_controller::get_tempdir_name($context->id, $user->id);
 
         // Extract the backup to tmpdir.
         $fb = get_file_packer('application/vnd.moodle.backup');
         $fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
 
         // Define the import.
-        $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id, \backup::TARGET_EXISTING_ADDING);
+        $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
 
