@@ -30,6 +30,9 @@ $string['cleanrecyclebin'] = 'Clean recycle bin';
 $string['expiry'] = 'Item lifetime';
 $string['expiry_desc'] = 'How long should a deleted activity remain in the recycle bin?';
 
+$string['autohide'] = 'Auto hide?';
+$string['autohide_desc'] = 'Automatically hides the recycle bin link when the bin is empty.';
+
 $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
 $string['empty'] = 'Empty recycle bin';
@@ -50,3 +53,5 @@ $string['event_purged_name'] = 'Item purged';
 $string['event_stored_description'] = 'Item stored with ID {$a->objectid}.';
 $string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
 $string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
+
+$string['emptybin'] = 'There are no items in the recycle bin.';
