@@ -63,9 +63,7 @@ if (!empty($action)) {
         case 'empty':
             require_capability('local/recyclebin:empty', $coursecontext);
             $recyclebin->empty_recycle_bin();
-            redirect(new \moodle_url('/course/view.php', array(
-                'id' => $courseid
-            )), get_string('alertemptied', 'local_recyclebin'), 2);
+            redirect($PAGE->url, get_string('alertemptied', 'local_recyclebin'), 2);
         break;
     }
 }
