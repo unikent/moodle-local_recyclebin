@@ -70,17 +70,19 @@ if (!empty($action)) {
     }
 }
 
-// Grab our items, redirect back to the course if there aren't any.
-$items = $recyclebin->get_items();
-if (empty($items)) {
-    redirect(new \moodle_url('/course/view.php', array(
-        'id' => $courseid
-    )));
-}
-
 // Output header.
 echo $OUTPUT->header();
 echo $OUTPUT->heading($PAGE->title);
+
+// Grab our items, check there is actually something to display.
+$items = $recyclebin->get_items();
+
+// Nothing to show? Bail out early.
+if (empty($items)) {
+    echo $OUTPUT->box(get_string('emptybin', 'local_recyclebin'));
+    echo $OUTPUT->footer();
+    die;
+}
 
 // Check permissions.
 $canrestore = has_capability('local/recyclebin:restore', $coursecontext);

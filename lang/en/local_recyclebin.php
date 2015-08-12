@@ -53,3 +53,5 @@ $string['event_purged_name'] = 'Item purged';
 $string['event_stored_description'] = 'Item stored with ID {$a->objectid}.';
 $string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
 $string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
+
+$string['emptybin'] = 'There are no items in the recycle bin.';
