@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This page shows the contents of a recyclebin for a given course.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
 
@@ -127,7 +135,8 @@ foreach ($items as $item) {
     $icon = '';
     if (isset($modules[$item->module])) {
         $mod = $modules[$item->module];
-        $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
+        $modname = get_string('modulename', $mod->name);
+        $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . $modname . '" /> ';
     }
 
     $row[] = "{$icon}{$item->name}";

@@ -14,10 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Recycle bin cron task.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_recyclebin\task;
 
 /**
  * This task deleted expired recyclebin items.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class clean_recyclebin extends \core\task\scheduled_task {
     /**

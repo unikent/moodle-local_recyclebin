@@ -24,6 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/**
+ * Adds a recycle bin link to the course admin menu.
+ *
+ * @param  settings_navigation $nav     Nav menu
+ * @param  context             $context Context of the menu
+ * @return navigation_node              A new navigation mode to insert.
+ */
 function local_recyclebin_extend_settings_navigation(settings_navigation $nav, context $context) {
     global $PAGE;
 
