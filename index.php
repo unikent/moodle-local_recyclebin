@@ -143,9 +143,7 @@ foreach ($items as $item) {
                 'action' => 'restore',
                 'sesskey' => sesskey()
             ));
-            $restore = \html_writer::link($restore, '<i class="fa fa-history"></i>', array(
-                'alt' => $restorestr
-            ));
+            $restore = $OUTPUT->action_icon($restore, new pix_icon('t/restore', get_string('restore'), '', array('class' => 'iconsmall')));
         }
 
         $row[] = $restore;
@@ -159,9 +157,7 @@ foreach ($items as $item) {
             'action' => 'delete',
             'sesskey' => sesskey()
         ));
-        $delete = \html_writer::link($delete, '<i class="fa fa-trash"></i>', array(
-            'alt' => $deletestr
-        ));
+        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete', get_string('delete'), '', array('class' => 'iconsmall')));
 
         $row[] = $delete;
     }
