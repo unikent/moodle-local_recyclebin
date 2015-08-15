@@ -88,6 +88,13 @@ if (empty($items)) {
     echo $OUTPUT->box(get_string('emptybin', 'local_recyclebin'));
     echo $OUTPUT->footer();
     die;
+} else {
+    $description = get_string('description', 'local_recyclebin');
+    $expiry = get_config('local_recyclebin', 'expiry');
+    if ($expiry > 0) {
+        $description .= ' ' . get_string('descriptionexpiry', 'local_recyclebin', $expiry);
+    }
+    echo $OUTPUT->box($description);
 }
 
 // Check permissions.
