@@ -76,6 +76,10 @@ if (!empty($action)) {
     }
 }
 
+// Add a "Go Back" button.
+$gobackurl = new \moodle_url('/course/view.php', array('id' => $courseid));
+$goback = $OUTPUT->single_button($gobackurl, get_string('goback', 'local_recyclebin'), 'get');
+
 // Output header.
 echo $OUTPUT->header();
 echo $OUTPUT->heading($PAGE->title);
@@ -86,6 +90,7 @@ $items = $recyclebin->get_items();
 // Nothing to show? Bail out early.
 if (empty($items)) {
     echo $OUTPUT->box(get_string('emptybin', 'local_recyclebin'));
+    echo $goback;
     echo $OUTPUT->footer();
     die;
 }
@@ -199,6 +204,8 @@ if (has_capability('local/recyclebin:empty', $coursecontext)) {
         'class' => 'singlebutton recycle-bin-delete-all'
     ));
 }
+
+echo $goback;
 
 // Confirmation JS.
 $PAGE->requires->strings_for_js(array('emptyconfirm', 'deleteconfirm'), 'local_recyclebin');

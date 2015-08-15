@@ -60,3 +60,4 @@ $string['descriptionexpiry'] = 'Contents will be permanently deleted after {$a} 
 $string['emptybin'] = 'There are no items in the recycle bin.';
 $string['emptyconfirm'] = 'Are you sure you want to delete all items in the recycle bin?';
 $string['deleteconfirm'] = 'Are you sure you want to delete the selected item(s) in the recycle bin?';
+$string['goback'] = 'Go back';
