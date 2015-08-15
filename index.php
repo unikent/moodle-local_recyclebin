@@ -166,7 +166,9 @@ foreach ($items as $item) {
             'action' => 'delete',
             'sesskey' => sesskey()
         ));
-        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete', get_string('delete'), '', array('class' => 'iconsmall')));
+        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete', 
+                get_string('delete'), '', array('class' => 'iconsmall')), null,
+                array('class' => 'action-icon recycle-bin-delete'));
 
         $row[] = $delete;
     }
@@ -185,8 +187,12 @@ if (has_capability('local/recyclebin:empty', $coursecontext)) {
         'sesskey' => sesskey()
     ));
 
-    echo \html_writer::link($empty, get_string('empty', 'local_recyclebin'));
+    echo \html_writer::link($empty, get_string('empty', 'local_recyclebin'),
+            array('class' => 'recycle-bin-delete-all'));
 }
+
+$PAGE->requires->string_for_js('emptyconfirm', 'local_recyclebin');
+$PAGE->requires->js_init_call('M.local_recyclebin.init');
 
 // Output footer.
 echo $OUTPUT->footer();

@@ -55,3 +55,4 @@ $string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
 $string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
 
 $string['emptybin'] = 'There are no items in the recycle bin.';
+$string['emptyconfirm'] = 'Are you sure you want to delete the selected item(s) in the recycle bin?';
