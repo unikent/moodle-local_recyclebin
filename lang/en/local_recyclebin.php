@@ -35,7 +35,7 @@ $string['autohide_desc'] = 'Automatically hides the recycle bin link when the bi
 
 $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
-$string['empty'] = 'Empty recycle bin';
+$string['empty'] = 'Delete all';
 
 $string['recyclebin:view'] = 'View recycle bin items';
 $string['recyclebin:restore'] = 'Restore recycle bin items';
