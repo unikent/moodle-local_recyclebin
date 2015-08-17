@@ -193,7 +193,7 @@ if (has_capability('local/recyclebin:empty', $coursecontext)) {
         'sesskey' => sesskey()
     ));
 
-    echo \html_writer::link($empty, get_string('empty', 'local_recyclebin'));
+    echo $OUTPUT->single_button($empty, get_string('empty', 'local_recyclebin'));
 }
 
 // Output footer.
