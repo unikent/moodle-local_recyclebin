@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This page shows the contents of a recyclebin for a given course.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/tablelib.php');
 
@@ -82,6 +90,14 @@ if (empty($items)) {
     die;
 }
 
+// Start with a description.
+$description = get_string('description', 'local_recyclebin');
+$expiry = get_config('local_recyclebin', 'expiry');
+if ($expiry > 0) {
+    $description .= ' ' . get_string('descriptionexpiry', 'local_recyclebin', $expiry);
+}
+echo $OUTPUT->box($description, 'generalbox descriptionbox');
+
 // Check permissions.
 $canrestore = has_capability('local/recyclebin:restore', $coursecontext);
 $candelete = has_capability('local/recyclebin:delete', $coursecontext);
@@ -127,7 +143,8 @@ foreach ($items as $item) {
     $icon = '';
     if (isset($modules[$item->module])) {
         $mod = $modules[$item->module];
-        $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . get_string('modulename', $mod->name) . '" /> ';
+        $modname = get_string('modulename', $mod->name);
+        $icon = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . $modname . '" /> ';
     }
 
     $row[] = "{$icon}{$item->name}";
@@ -143,9 +160,7 @@ foreach ($items as $item) {
                 'action' => 'restore',
                 'sesskey' => sesskey()
             ));
-            $restore = \html_writer::link($restore, '<i class="fa fa-history"></i>', array(
-                'alt' => $restorestr
-            ));
+            $restore = $OUTPUT->action_icon($restore, new pix_icon('t/restore', get_string('restore'), '', array('class' => 'iconsmall')));
         }
 
         $row[] = $restore;
@@ -159,9 +174,9 @@ foreach ($items as $item) {
             'action' => 'delete',
             'sesskey' => sesskey()
         ));
-        $delete = \html_writer::link($delete, '<i class="fa fa-trash"></i>', array(
-            'alt' => $deletestr
-        ));
+        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete',
+                get_string('delete'), '', array('class' => 'iconsmall')), null,
+                array('class' => 'action-icon recycle-bin-delete'));
 
         $row[] = $delete;
     }
@@ -180,8 +195,14 @@ if (has_capability('local/recyclebin:empty', $coursecontext)) {
         'sesskey' => sesskey()
     ));
 
-    echo \html_writer::link($empty, get_string('empty', 'local_recyclebin'));
+    echo $OUTPUT->single_button($empty, get_string('empty', 'local_recyclebin'), 'post', array(
+        'class' => 'singlebutton recycle-bin-delete-all'
+    ));
 }
+
+// Confirmation JS.
+$PAGE->requires->strings_for_js(array('emptyconfirm', 'deleteconfirm'), 'local_recyclebin');
+$PAGE->requires->js_init_call('M.local_recyclebin.init');
 
 // Output footer.
 echo $OUTPUT->footer();

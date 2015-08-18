@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Upgrade code
+ * Upgrade code.
  *
  * @package    local_recyclebin
  * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>

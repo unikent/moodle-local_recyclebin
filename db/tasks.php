@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Recycle bin tasks.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 $tasks = array(
     array(
         'classname' => 'local_recyclebin\task\clean_recyclebin',

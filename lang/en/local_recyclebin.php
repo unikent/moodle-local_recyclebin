@@ -54,4 +54,9 @@ $string['event_stored_description'] = 'Item stored with ID {$a->objectid}.';
 $string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
 $string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
 
+$string['description'] = 'Items that have been deleted from a course can be restored and will appear at the bottom of the section from which they were deleted.';
+$string['descriptionexpiry'] = 'Contents will be permanently deleted after {$a} days.';
+
 $string['emptybin'] = 'There are no items in the recycle bin.';
+$string['emptyconfirm'] = 'Are you sure you want to delete all items in the recycle bin?';
+$string['deleteconfirm'] = 'Are you sure you want to delete the selected item(s) in the recycle bin?';

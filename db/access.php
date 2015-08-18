@@ -18,7 +18,7 @@
  * Plugin capabilities
  *
  * @package    local_recyclebin
- * @copyright  2016 University of Kent
+ * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

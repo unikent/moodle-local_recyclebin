@@ -14,17 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The main interface for recycle bin methods.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_recyclebin;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * RecycleBin class.
+ *
+ * @package    local_recyclebin
+ * @copyright  2015 University of Kent
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class RecycleBin
 {
     private $_courseid;
 
+    /**
+     * Constructor.
+     *
+     * @param int $courseid Course ID.
+     */
     public function __construct($courseid) {
         $this->_courseid = $courseid;
     }
@@ -42,7 +59,8 @@ class RecycleBin
 
     /**
      * Store a course module in the recycle bin.
-     * @param $cm
+     *
+     * @param $cm stdClass Course module
      * @throws \coding_exception
      * @throws \invalid_dataroot_permissions
      * @throws \moodle_exception
@@ -63,7 +81,14 @@ class RecycleBin
 
         // Backup the activity.
         $user = get_admin();
-        $controller = new \backup_controller(\backup::TYPE_1ACTIVITY, $cm->id, \backup::FORMAT_MOODLE, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id);
+        $controller = new \backup_controller(
+            \backup::TYPE_1ACTIVITY,
+            $cm->id,
+            \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $user->id
+        );
         $controller->execute_plan();
 
         // Grab the result.
@@ -114,7 +139,8 @@ class RecycleBin
 
     /**
      * Restore an item from the recycle bin.
-     * @param $item
+     *
+     * @param stdClass $item The item database record
      * @throws \Exception
      * @throws \coding_exception
      * @throws \moodle_exception
@@ -144,7 +170,14 @@ class RecycleBin
         $fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
 
         // Define the import.
-        $controller = new \restore_controller($tmpdir, $this->_courseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $user->id, \backup::TARGET_EXISTING_ADDING);
+        $controller = new \restore_controller(
+            $tmpdir,
+            $this->_courseid,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $user->id,
+            \backup::TARGET_EXISTING_ADDING
+        );
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
 
@@ -175,7 +208,8 @@ class RecycleBin
 
     /**
      * Delete an item from the recycle bin.
-     * @param $item
+     *
+     * @param stdClass $item The item database record
      * @throws \coding_exception
      */
     public function delete_item($item) {
@@ -204,7 +238,8 @@ class RecycleBin
 
     /**
      * Delete an item from the recycle bin.
-     * @param $item
+     *
+     * @param stdClass $item The item database record
      */
     private function cleanup_item($item) {
         global $CFG, $DB;
