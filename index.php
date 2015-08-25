@@ -113,16 +113,15 @@ $headers = array(
     get_string('deleted', 'local_recyclebin')
 );
 
-if ($canrestore) {
-    $columns[] = 'restore';
-    $headers[] = $restorestr;
-}
-
 if ($candelete) {
     $columns[] = 'delete';
     $headers[] = $deletestr;
 }
 
+if ($canrestore) {
+    $columns[] = 'restore';
+    $headers[] = $restorestr;
+}
 
 // Define a table.
 $table = new flexible_table('recyclebin');
@@ -150,6 +149,21 @@ foreach ($items as $item) {
     $row[] = "{$icon}{$item->name}";
     $row[] = userdate($item->deleted);
 
+    // Build delete link.
+    if ($candelete) {
+        $delete = new \moodle_url('/local/recyclebin/index.php', array(
+            'course' => $courseid,
+            'itemid' => $item->id,
+            'action' => 'delete',
+            'sesskey' => sesskey()
+        ));
+        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete',
+                get_string('delete'), '', array('class' => 'iconsmall')), null,
+                array('class' => 'action-icon recycle-bin-delete'));
+
+        $row[] = $delete;
+    }
+
     // Build restore link.
     if ($canrestore) {
         $restore = '';
@@ -164,21 +178,6 @@ foreach ($items as $item) {
         }
 
         $row[] = $restore;
-    }
-
-    // Build delete link.
-    if ($candelete) {
-        $delete = new \moodle_url('/local/recyclebin/index.php', array(
-            'course' => $courseid,
-            'itemid' => $item->id,
-            'action' => 'delete',
-            'sesskey' => sesskey()
-        ));
-        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete',
-                get_string('delete'), '', array('class' => 'iconsmall')), null,
-                array('class' => 'action-icon recycle-bin-delete'));
-
-        $row[] = $delete;
     }
 
     $table->add_data($row);
