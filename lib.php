@@ -34,52 +34,70 @@ defined('MOODLE_INTERNAL') || die;
 function local_recyclebin_extend_settings_navigation(settings_navigation $nav, context $context) {
     global $PAGE;
 
-    // Only add this settings item on non-site course pages.
-    if (!$PAGE->course || $PAGE->course->id == SITEID) {
-        return null;
+    $url = null;
+    $bin = null;
+    $settingnode = null;
+
+    // What context are we in?
+    if ($context->contextlevel == \CONTEXT_COURSECAT) {
+        // Add a link to the category recyclebin.
+        $bin = new \local_recyclebin\category($context->instanceid);
+        $url = new moodle_url('/local/recyclebin/index.php', array(
+            'contextid' => $context->id
+        ));
+
+        $settingnode = $nav->find('categorysettings', null);
+    } else if ($context->contextlevel == \CONTEXT_COURSE) {
+        // Only add this settings item on non-site course pages.
+        if (!$PAGE->course || $PAGE->course->id == SITEID) {
+            return null;
+        }
+
+        // Check we can view the recycle bin.
+        if (!has_capability('local/recyclebin:view_item', $context)) {
+            return null;
+        }
+
+        $bin = new \local_recyclebin\course($context->instanceid);
+        $url = new moodle_url('/local/recyclebin/index.php', array(
+            'contextid' => $context->id
+        ));
+
+        $settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE);
     }
 
-    // Check we can view the recycle bin.
-    $context = \context_course::instance($PAGE->course->id);
-    if (!has_capability('local/recyclebin:view_item', $context)) {
-        return null;
+    if ($settingnode == null) {
+        return;
     }
 
     // If we are set to auto-hide, check the number of items.
     $autohide = get_config('local_recyclebin', 'autohide');
     if ($autohide) {
-        $course = new \local_recyclebin\course($PAGE->course->id);
-        $items = $course->get_items();
+        $items = $bin->get_items();
         if (empty($items)) {
             return null;
         }
     }
 
     // Add the recyclebin link.
-    if ($settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE)) {
-        $url = new moodle_url('/local/recyclebin/index.php', array(
-            'course' => $context->instanceid
-        ));
+    $pluginname = get_string('pluginname', 'local_recyclebin');
 
-        $pluginname = get_string('pluginname', 'local_recyclebin');
+    $node = navigation_node::create(
+        $pluginname,
+        $url,
+        navigation_node::NODETYPE_LEAF,
+        'local_recyclebin',
+        'local_recyclebin',
+        new pix_icon('e/cleanup_messy_code', $pluginname)
+    );
 
-        $node = navigation_node::create(
-            $pluginname,
-            $url,
-            navigation_node::NODETYPE_LEAF,
-            'local_recyclebin',
-            'local_recyclebin',
-            new pix_icon('e/cleanup_messy_code', $pluginname)
-        );
-
-        if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
-            $node->make_active();
-        }
-
-        $settingnode->add_node($node);
-
-        return $node;
+    if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
+        $node->make_active();
     }
+
+    $settingnode->add_node($node);
+
+    return $node;
 }
 
 /**
