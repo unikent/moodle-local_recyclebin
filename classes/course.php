@@ -104,7 +104,10 @@ class course extends recyclebin
         }
 
         // Make sure our backup dir exists.
-        $this->ensure_backup_dir_exists();
+        $bindir = $CFG->dataroot . '/recyclebin';
+        if (!file_exists($bindir)) {
+            make_writable_directory($bindir);
+        }
 
         // Record the activity, get an ID.
         $binid = $DB->insert_record('local_recyclebin_course', array(
@@ -118,7 +121,7 @@ class course extends recyclebin
         // Move the file to our own special little place.
         if (!$file->copy_content_to($bindir . '/' . $binid)) {
             // Failed, cleanup first.
-            $DB->delete_record('local_recyclebin_course', array(
+            $DB->delete_records('local_recyclebin_course', array(
                 'id' => $binid
             ));
 

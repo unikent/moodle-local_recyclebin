@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class category
+class category extends recyclebin
 {
     private $_categoryid;
 
@@ -95,7 +95,10 @@ class category
         }
 
         // Make sure our backup dir exists.
-        $this->ensure_backup_dir_exists();
+        $bindir = $CFG->dataroot . '/recyclebin';
+        if (!file_exists($bindir)) {
+            make_writable_directory($bindir);
+        }
 
         // Record the activity, get an ID.
         $binid = $DB->insert_record('local_recyclebin_category', array(
@@ -108,7 +111,7 @@ class category
         // Move the file to our own special little place.
         if (!$file->copy_content_to($bindir . '/course-' . $binid)) {
             // Failed, cleanup first.
-            $DB->delete_record('local_recyclebin_category', array(
+            $DB->delete_records('local_recyclebin_category', array(
                 'id' => $binid
             ));
 

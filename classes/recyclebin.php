@@ -80,16 +80,4 @@ abstract class recyclebin
             $this->delete_item($item);
         }
     }
-
-    /**
-     * Ensure our backup dir exists.
-     */
-    protected function ensure_backup_dir_exists() {
-        global $CFG;
-
-        $bindir = $CFG->dataroot . '/recyclebin';
-        if (!file_exists($bindir)) {
-            make_writable_directory($bindir);
-        }
-    }
 }
