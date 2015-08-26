@@ -61,13 +61,15 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
             'course' => $context->instanceid
         ));
 
+        $pluginname = get_string('pluginname', 'local_recyclebin');
+
         $node = navigation_node::create(
-            'Recycle bin',
+            $pluginname,
             $url,
             navigation_node::NODETYPE_LEAF,
             'local_recyclebin',
             'local_recyclebin',
-            new pix_icon('e/cleanup_messy_code', 'Recycle bin')
+            new pix_icon('e/cleanup_messy_code', $pluginname)
         );
 
         if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
