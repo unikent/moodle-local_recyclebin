@@ -36,6 +36,8 @@ $capabilities = array(
     'delete' => ''
 );
 
+$description = '';
+
 // We could be a course or a category.
 switch ($context->contextlevel) {
     case \CONTEXT_COURSE:
@@ -48,6 +50,7 @@ switch ($context->contextlevel) {
         );
 
         $recyclebin = new \local_recyclebin\course($context->instanceid);
+        $description = get_string('description_course', 'local_recyclebin');
     break;
 
     case \CONTEXT_COURSECAT:
@@ -61,10 +64,11 @@ switch ($context->contextlevel) {
         );
 
         $recyclebin = new \local_recyclebin\category($context->instanceid);
+        $description = get_string('description_coursecat', 'local_recyclebin');
     break;
 
     default:
-        print_error("Invalid context supplied.");
+        print_error('invalidcontext', 'local_recyclebin');
     break;
 }
 
@@ -131,7 +135,6 @@ if (empty($items)) {
 }
 
 // Start with a description.
-$description = get_string('description', 'local_recyclebin');
 $expiry = get_config('local_recyclebin', 'expiry');
 if ($expiry > 0) {
     $description .= ' ' . get_string('descriptionexpiry', 'local_recyclebin', $expiry);
