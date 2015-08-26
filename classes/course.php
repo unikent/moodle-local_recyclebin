@@ -47,6 +47,19 @@ class course extends recyclebin
     }
 
     /**
+     * Returns an item from the recycle bin.
+     *
+     * @param $item int Item ID to retrieve.
+     */
+    public function get_item($itemid) {
+        global $DB;
+
+        return $DB->get_record('local_recyclebin_course', array(
+            'id' => $itemid
+        ), '*', MUST_EXIST);
+    }
+
+    /**
      * Returns a list of items in the recycle bin for this course.
      */
     public function get_items() {

@@ -36,7 +36,14 @@ defined('MOODLE_INTERNAL') || die();
 abstract class recyclebin
 {
     /**
-     * Returns a list of items in the recycle bin for this course.
+     * Returns an item from the recycle bin.
+     *
+     * @param $item int Item ID to retrieve.
+     */
+    public abstract function get_item($itemid);
+
+    /**
+     * Returns a list of items in the recycle bin.
      */
     public abstract function get_items();
 

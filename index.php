@@ -83,9 +83,7 @@ if (!empty($action)) {
     $item = null;
     if ($action == 'restore' || $action == 'delete') {
         $itemid = required_param('itemid', PARAM_INT);
-        $item = $DB->get_record('local_recyclebin_course', array(
-            'id' => $itemid
-        ), '*', MUST_EXIST);
+        $item = $recyclebin->get_item($itemid);
     }
 
     switch ($action) {
@@ -185,16 +183,13 @@ foreach ($items as $item) {
     $row = array();
 
     // Build item name.
-    $name = '';
+    $name = $item->name;
     if ($context->contextlevel == \CONTEXT_COURSE) {
-        $name = $item->name;
         if (isset($modules[$item->module])) {
             $mod = $modules[$item->module];
             $modname = get_string('modulename', $mod->name);
             $name = '<img src="' . $OUTPUT->pix_url('icon', $mod->name) . '" class="icon" alt="' . $modname . '" /> ' . $name;
         }
-    } else {
-        $name = get_course_display_name_for_list($item);
     }
 
     $row[] = $name;

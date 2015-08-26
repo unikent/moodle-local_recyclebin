@@ -47,14 +47,37 @@ class category extends recyclebin
     }
 
     /**
+     * Returns an item from the recycle bin.
+     *
+     * @param $item int Item ID to retrieve.
+     */
+    public function get_item($itemid) {
+        global $DB;
+
+        $item = $DB->get_record('local_recyclebin_category', array(
+            'id' => $itemid
+        ), '*', MUST_EXIST);
+
+        $item->name = get_course_display_name_for_list($item);
+
+        return $item;
+    }
+
+    /**
      * Returns a list of items in the recycle bin for this course.
      */
     public function get_items() {
         global $DB;
 
-        return $DB->get_records('local_recyclebin_category', array(
+        $items = $DB->get_records('local_recyclebin_category', array(
             'category' => $this->_categoryid
         ));
+
+        foreach ($items as $item) {
+            $item->name = get_course_display_name_for_list($item);
+        }
+
+        return $items;
     }
 
     /**
@@ -241,7 +264,7 @@ class category extends recyclebin
         // Fire event.
         $event = \local_recyclebin\event\course_purged::create(array(
             'objectid' => $item->id,
-            'context' => \context_course::instance($item->course)
+            'context' => \context_coursecat::instance($item->category)
         ));
         $event->add_record_snapshot('local_recyclebin_category', $item);
         $event->trigger();
