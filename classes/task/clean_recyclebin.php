@@ -53,7 +53,7 @@ class clean_recyclebin extends \core\task\scheduled_task {
         $deletefrom = time() - (86400 * $lifetime);
         $items = $DB->get_recordset_select('local_recyclebin', 'deleted < ?', array($deletefrom), '', 'id');
         foreach ($items as $item) {
-            mtrace("[RecycleBin] Deleting item {$item->id}...\n");
+            mtrace("[RecycleBin] Deleting item {$item->id}...");
 
             $bin = new \local_recyclebin\RecycleBin($item->course);
             $bin->delete_item($item);
