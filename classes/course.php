@@ -104,10 +104,7 @@ class course extends recyclebin
         }
 
         // Make sure our backup dir exists.
-        $bindir = $CFG->dataroot . '/recyclebin';
-        if (!file_exists($bindir)) {
-            make_writable_directory($bindir);
-        }
+        $this->ensure_backup_dir_exists();
 
         // Record the activity, get an ID.
         $binid = $DB->insert_record('local_recyclebin_course', array(
@@ -127,6 +124,8 @@ class course extends recyclebin
 
             throw new \moodle_exception("Failed to copy backup file to recyclebin.");
         }
+
+        // Delete the old file.
         $file->delete();
 
         // Fire event.
@@ -178,6 +177,8 @@ class course extends recyclebin
             $user->id,
             \backup::TARGET_EXISTING_ADDING
         );
+
+        // Prechecks.
         if (!$controller->execute_precheck()) {
             $results = $controller->get_precheck_results();
 
@@ -203,16 +204,17 @@ class course extends recyclebin
         $event->trigger();
 
         // Cleanup.
-        $this->cleanup_item($item);
+        $this->delete_item($item, true);
     }
 
     /**
      * Delete an item from the recycle bin.
      *
      * @param stdClass $item The item database record
+     * @param boolean $noevent Whether or not to fire a purged event.
      * @throws \coding_exception
      */
-    public function delete_item($item) {
+    public function delete_item($item, $noevent = false) {
         global $CFG, $DB;
 
         // Delete the file.
@@ -222,6 +224,10 @@ class course extends recyclebin
         $DB->delete_records('local_recyclebin_course', array(
             'id' => $item->id
         ));
+
+        if ($noevent) {
+            return;
+        }
 
         // Fire event.
         $event = \local_recyclebin\event\item_purged::create(array(

@@ -53,7 +53,7 @@ class category
         global $DB;
 
         return $DB->get_records('local_recyclebin_category', array(
-            'course' => $this->_courseid
+            'category' => $this->_categoryid
         ));
     }
 
@@ -66,7 +66,64 @@ class category
      * @throws \moodle_exception
      */
     public function store_item($course) {
-        // TODO.
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
+
+        // Backup the course.
+        $user = get_admin();
+        $controller = new \backup_controller(
+            \backup::TYPE_1COURSE,
+            $course->id,
+            \backup::FORMAT_MOODLE,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $user->id
+        );
+        $controller->execute_plan();
+
+        // Grab the result.
+        $result = $controller->get_results();
+        if (!isset($result['backup_destination'])) {
+            throw new \moodle_exception('Failed to backup activity prior to deletion.');
+        }
+
+        // Grab the filename.
+        $file = $result['backup_destination'];
+        if (!$file->get_contenthash()) {
+            throw new \moodle_exception('Failed to backup activity prior to deletion (invalid file).');
+        }
+
+        // Make sure our backup dir exists.
+        $this->ensure_backup_dir_exists();
+
+        // Record the activity, get an ID.
+        $binid = $DB->insert_record('local_recyclebin_category', array(
+            'category' => $course->category,
+            'shortname' => $course->shortname,
+            'fullname' => $course->fullname,
+            'deleted' => time()
+        ));
+
+        // Move the file to our own special little place.
+        if (!$file->copy_content_to($bindir . '/course-' . $binid)) {
+            // Failed, cleanup first.
+            $DB->delete_record('local_recyclebin_category', array(
+                'id' => $binid
+            ));
+
+            throw new \moodle_exception("Failed to copy backup file to recyclebin.");
+        }
+
+        // Delete the old file.
+        $file->delete();
+
+        // Fire event.
+        $event = \local_recyclebin\event\course_stored::create(array(
+            'objectid' => $binid,
+            'context' => \context_coursecat::instance($course->category)
+        ));
+        $event->trigger();
     }
 
     /**
@@ -79,16 +136,111 @@ class category
      * @throws \restore_controller_exception
      */
     public function restore_item($item) {
-        // TODO.
+        global $CFG;
+
+        require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
+        require_once($CFG->dirroot . '/course/lib.php');
+
+        $user = get_admin();
+
+        // Build a course.
+        $course = new \stdClass();
+        $course->category = $this->_categoryid;
+        $course->shortname = $item->shortname;
+        $course->fullname = $item->fullname;
+        $course->summary = '';
+
+        // TODO - Maybe handle non-unique shortnames, missing categories, etc?
+
+        // Create a new course.
+        $course = create_course($course);
+        if (!$course) {
+            throw new \moodle_exception("Could not create course to restore into.");
+        }
+
+        // Get the pathname.
+        $source = $CFG->dataroot . '/recyclebin/course-' . $item->id;
+        if (!file_exists($source)) {
+            throw new \moodle_exception('Invalid recycle bin item!');
+        }
+
+        // Grab the course context.
+        $context = \context_coursecat::instance($this->_categoryid);
+
+        // Grab a tmpdir.
+        $tmpdir = \restore_controller::get_tempdir_name($context->id, $user->id);
+
+        // Extract the backup to tmpdir.
+        $fb = get_file_packer('application/vnd.moodle.backup');
+        $fb->extract_to_pathname($source, $CFG->tempdir . '/backup/' . $tmpdir . '/');
+
+        // Define the import.
+        $controller = new \restore_controller(
+            $tmpdir,
+            $course->id,
+            \backup::INTERACTIVE_NO,
+            \backup::MODE_GENERAL,
+            $user->id,
+            \backup::TARGET_NEW_COURSE
+        );
+
+        // Prechecks.
+        if (!$controller->execute_precheck()) {
+            $results = $controller->get_precheck_results();
+
+            if (isset($results['errors'])) {
+                debugging(var_export($results, true));
+                throw new \moodle_exception("Restore failed.");
+            }
+
+            if (isset($results['warnings'])) {
+                debugging(var_export($results['warnings'], true));
+            }
+        }
+
+        // Run the import.
+        $controller->execute_plan();
+
+        // Fire event.
+        $event = \local_recyclebin\event\course_restored::create(array(
+            'objectid' => $item->id,
+            'context' => $context
+        ));
+        $event->add_record_snapshot('local_recyclebin_category', $item);
+        $event->trigger();
+
+        // Cleanup.
+        $this->delete_item($item, true);
     }
 
     /**
      * Delete an item from the recycle bin.
      *
      * @param stdClass $item The item database record
+     * @param boolean $noevent Whether or not to fire a purged event.
      * @throws \coding_exception
      */
-    public function delete_item($item) {
-        // TODO.
+    public function delete_item($item, $noevent = false) {
+        global $CFG, $DB;
+
+        // Delete the file.
+        unlink($CFG->dataroot . '/recyclebin/course-' . $item->id);
+
+        // Delete the record.
+        $DB->delete_records('local_recyclebin_category', array(
+            'id' => $item->id
+        ));
+
+        if ($noevent) {
+            return;
+        }
+
+        // Fire event.
+        $event = \local_recyclebin\event\course_purged::create(array(
+            'objectid' => $item->id,
+            'context' => \context_course::instance($item->course)
+        ));
+        $event->add_record_snapshot('local_recyclebin_category', $item);
+        $event->trigger();
     }
 }

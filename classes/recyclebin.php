@@ -65,9 +65,10 @@ abstract class recyclebin
      * Delete an item from the recycle bin.
      *
      * @param stdClass $item The item database record
+     * @param boolean $noevent Whether or not to fire a purged event.
      * @throws \coding_exception
      */
-    public abstract function delete_item($item);
+    public abstract function delete_item($item, $noevent = false);
 
     /**
      * Empty the recycle bin.
@@ -77,6 +78,18 @@ abstract class recyclebin
         $items = $this->get_items();
         foreach ($items as $item) {
             $this->delete_item($item);
+        }
+    }
+
+    /**
+     * Ensure our backup dir exists.
+     */
+    protected function ensure_backup_dir_exists() {
+        global $CFG;
+
+        $bindir = $CFG->dataroot . '/recyclebin';
+        if (!file_exists($bindir)) {
+            make_writable_directory($bindir);
         }
     }
 }
