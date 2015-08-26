@@ -39,7 +39,7 @@ class item_restored extends \core\event\base
      * Init method.
      */
     protected function init() {
-        $this->data['objecttable'] = 'local_recyclebin';
+        $this->data['objecttable'] = 'local_recyclebin_course';
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

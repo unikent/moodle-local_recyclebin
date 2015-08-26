@@ -41,14 +41,14 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
 
     // Check we can view the recycle bin.
     $context = \context_course::instance($PAGE->course->id);
-    if (!has_capability('local/recyclebin:view', $context)) {
+    if (!has_capability('local/recyclebin:view_item', $context)) {
         return null;
     }
 
     // If we are set to auto-hide, check the number of items.
     $autohide = get_config('local_recyclebin', 'autohide');
     if ($autohide) {
-        $course = new \local_recyclebin\RecycleBin($PAGE->course->id);
+        $course = new \local_recyclebin\course($PAGE->course->id);
         $items = $course->get_items();
         if (empty($items)) {
             return null;
@@ -83,7 +83,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
 }
 
 /**
- * For pre-2.9.
+ * For pre-2.9 installations.
  *
  * @param settings_navigation $nav
  * @param context $context

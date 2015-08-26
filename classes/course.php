@@ -27,13 +27,13 @@ namespace local_recyclebin;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * RecycleBin class.
+ * Represents a course's recyclebin.
  *
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class RecycleBin
+class course extends recyclebin
 {
     private $_courseid;
 
@@ -52,7 +52,7 @@ class RecycleBin
     public function get_items() {
         global $DB;
 
-        return $DB->get_records('local_recyclebin', array(
+        return $DB->get_records('local_recyclebin_course', array(
             'course' => $this->_courseid
         ));
     }
@@ -110,7 +110,7 @@ class RecycleBin
         }
 
         // Record the activity, get an ID.
-        $binid = $DB->insert_record('local_recyclebin', array(
+        $binid = $DB->insert_record('local_recyclebin_course', array(
             'course' => $cm->course,
             'section' => $cm->section,
             'module' => $cm->module,
@@ -121,7 +121,7 @@ class RecycleBin
         // Move the file to our own special little place.
         if (!$file->copy_content_to($bindir . '/' . $binid)) {
             // Failed, cleanup first.
-            $DB->delete_record('local_recyclebin', array(
+            $DB->delete_record('local_recyclebin_course', array(
                 'id' => $binid
             ));
 
@@ -199,7 +199,7 @@ class RecycleBin
             'objectid' => $item->id,
             'context' => $context
         ));
-        $event->add_record_snapshot('local_recyclebin', $item);
+        $event->add_record_snapshot('local_recyclebin_course', $item);
         $event->trigger();
 
         // Cleanup.
@@ -213,43 +213,22 @@ class RecycleBin
      * @throws \coding_exception
      */
     public function delete_item($item) {
-        // Do the cleanup.
-        $this->cleanup_item($item);
-
-        // Fire event.
-        $event = \local_recyclebin\event\item_purged::create(array(
-            'objectid' => $item->id,
-            'context' => \context_course::instance($item->course)
-        ));
-        $event->add_record_snapshot('local_recyclebin', $item);
-        $event->trigger();
-    }
-
-    /**
-     * Empty the recycle bin.
-     */
-    public function empty_recycle_bin() {
-        // Cleanup all items.
-        $items = $this->get_items();
-        foreach ($items as $item) {
-            $this->delete_item($item);
-        }
-    }
-
-    /**
-     * Delete an item from the recycle bin.
-     *
-     * @param stdClass $item The item database record
-     */
-    private function cleanup_item($item) {
         global $CFG, $DB;
 
         // Delete the file.
         unlink($CFG->dataroot . '/recyclebin/' . $item->id);
 
         // Delete the record.
-        $DB->delete_records('local_recyclebin', array(
+        $DB->delete_records('local_recyclebin_course', array(
             'id' => $item->id
         ));
+
+        // Fire event.
+        $event = \local_recyclebin\event\item_purged::create(array(
+            'objectid' => $item->id,
+            'context' => \context_course::instance($item->course)
+        ));
+        $event->add_record_snapshot('local_recyclebin_course', $item);
+        $event->trigger();
     }
 }

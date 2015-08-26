@@ -51,11 +51,23 @@ class clean_recyclebin extends \core\task\scheduled_task {
         }
 
         $deletefrom = time() - (86400 * $lifetime);
-        $items = $DB->get_recordset_select('local_recyclebin', 'deleted < ?', array($deletefrom), '', 'id');
+
+        // Delete course modules.
+        $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < ?', array($deletefrom), '', 'id');
         foreach ($items as $item) {
             mtrace("[RecycleBin] Deleting item {$item->id}...");
 
-            $bin = new \local_recyclebin\RecycleBin($item->course);
+            $bin = new \local_recyclebin\course($item->course);
+            $bin->delete_item($item);
+        }
+        $items->close();
+
+        // Delete courses.
+        $items = $DB->get_recordset_select('local_recyclebin_category', 'deleted < ?', array($deletefrom), '', 'id');
+        foreach ($items as $item) {
+            mtrace("[RecycleBin] Deleting course {$item->id}...");
+
+            $bin = new \local_recyclebin\category($item->category);
             $bin->delete_item($item);
         }
         $items->close();

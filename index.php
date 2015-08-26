@@ -30,14 +30,14 @@ $action = optional_param('action', null, PARAM_ALPHA);
 $context = \context_course::instance($courseid, MUST_EXIST);
 
 require_login($courseid);
-require_capability('local/recyclebin:view', $context);
+require_capability('local/recyclebin:view_item', $context);
 
 $PAGE->set_url('/local/recyclebin/index.php', array(
     'course' => $courseid
 ));
 $PAGE->set_title(get_string('pluginname', 'local_recyclebin'));
 
-$recyclebin = new \local_recyclebin\RecycleBin($courseid);
+$recyclebin = new \local_recyclebin\course($courseid);
 
 // If we are doing anything, we need a sesskey!
 if (!empty($action)) {
@@ -47,7 +47,7 @@ if (!empty($action)) {
     $item = null;
     if ($action == 'restore' || $action == 'delete') {
         $itemid = required_param('itemid', PARAM_INT);
-        $item = $DB->get_record('local_recyclebin', array(
+        $item = $DB->get_record('local_recyclebin_course', array(
             'id' => $itemid
         ), '*', MUST_EXIST);
     }
@@ -55,22 +55,22 @@ if (!empty($action)) {
     switch ($action) {
         // Restore it.
         case 'restore':
-            require_capability('local/recyclebin:restore', $context);
+            require_capability('local/recyclebin:restore_item', $context);
             $recyclebin->restore_item($item);
             redirect($PAGE->url, get_string('alertrestored', 'local_recyclebin', $item), 2);
         break;
 
         // Delete it.
         case 'delete':
-            require_capability('local/recyclebin:delete', $context);
+            require_capability('local/recyclebin:delete_item', $context);
             $recyclebin->delete_item($item);
             redirect($PAGE->url, get_string('alertdeleted', 'local_recyclebin', $item), 2);
         break;
 
         // Empty it.
         case 'empty':
-            require_capability('local/recyclebin:empty', $context);
-            $recyclebin->empty_recycle_bin();
+            require_capability('local/recyclebin:delete_item', $context);
+            $recyclebin->delete_all_items();
             redirect($PAGE->url, get_string('alertemptied', 'local_recyclebin'), 2);
         break;
     }
@@ -105,8 +105,8 @@ if ($expiry > 0) {
 echo $OUTPUT->box($description, 'generalbox descriptionbox');
 
 // Check permissions.
-$canrestore = has_capability('local/recyclebin:restore', $context);
-$candelete = has_capability('local/recyclebin:delete', $context);
+$canrestore = has_capability('local/recyclebin:restore_item', $context);
+$candelete = has_capability('local/recyclebin:delete_item', $context);
 
 // Strings.
 $restorestr = get_string('restore');
@@ -193,7 +193,7 @@ foreach ($items as $item) {
 $table->print_html();
 
 // Empty recyclebin link.
-if (has_capability('local/recyclebin:empty', $context)) {
+if ($candelete) {
     $empty = new \moodle_url('/local/recyclebin/index.php', array(
         'course' => $courseid,
         'action' => 'empty',

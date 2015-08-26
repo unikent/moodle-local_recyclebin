@@ -36,14 +36,26 @@ defined('MOODLE_INTERNAL') || die();
 class Observer
 {
     /**
-     * Main hook.
+     * Course hook.
+     * Note: This is not actually a typical observer.
+     * There is no pre-course delete event, see README.
+     *
+     * @param \stdClass $course The course record.
+     */
+    public static function pre_course_delete($course) {
+        $recyclebin = new \local_recyclebin\category($course->category);
+        $recyclebin->store_item($course);
+    }
+
+    /**
+     * Course module hook.
      * Note: This is not actually a typical observer.
      * There is no pre-cm event, see README.
      *
      * @param \stdClass $cm The course module record.
      */
     public static function pre_cm_delete($cm) {
-        $recyclebin = new \local_recyclebin\RecycleBin($cm->course);
+        $recyclebin = new \local_recyclebin\course($cm->course);
         $recyclebin->store_item($cm);
     }
 }

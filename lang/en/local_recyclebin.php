@@ -37,10 +37,13 @@ $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
 $string['empty'] = 'Empty recycle bin';
 
-$string['recyclebin:view'] = 'View recycle bin items';
-$string['recyclebin:restore'] = 'Restore recycle bin items';
-$string['recyclebin:delete'] = 'Delete recycle bin items';
-$string['recyclebin:empty'] = 'Empty recycle bins';
+$string['recyclebin:view_item'] = 'View course recycle bin items';
+$string['recyclebin:restore_item'] = 'Restore course recycle bin items';
+$string['recyclebin:delete_item'] = 'Delete course recycle bin items';
+
+$string['recyclebin:view_course'] = 'View category recycle bin items';
+$string['recyclebin:restore_course'] = 'Restore category recycle bin items';
+$string['recyclebin:delete_course'] = 'Delete category recycle bin items';
 
 $string['alertrestored'] = '{$a->name} has been restored';
 $string['alertdeleted'] = '{$a->name} has been deleted';
