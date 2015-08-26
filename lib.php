@@ -35,7 +35,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
     global $PAGE;
 
     // Only add this settings item on non-site course pages.
-    if (!$PAGE->course or $PAGE->course->id == SITEID) {
+    if (!$PAGE->course || $PAGE->course->id == SITEID) {
         return null;
     }
 
