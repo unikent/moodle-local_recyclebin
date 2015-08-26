@@ -2,6 +2,8 @@
 This plugin adds a "recycle bin" for course modules to Moodle.
 It requires a core hack.
 
+See documentation here: https://docs.moodle.org/29/en/local/Recycle_bin
+
 ## Installation
 As there is no pre-cm-deleted event, you will need to add a line to '/course/lib.php' (function course_delete_module), right after the first "if()".
 ```
