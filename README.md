@@ -20,6 +20,3 @@ index e49bdf1..5f8d6e6 100644
      $modcontext = context_module::instance($cm->id);
  
 ```
-
-## Menu
-![Image of Menu] (https://cloud.githubusercontent.com/assets/4242976/7748834/3c5cd14e-ffc0-11e4-8fea-4db5fa0319d9.png)
