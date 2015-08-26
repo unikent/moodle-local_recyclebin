@@ -121,7 +121,7 @@ class RecycleBin
         // Move the file to our own special little place.
         if (!$file->copy_content_to($bindir . '/' . $binid)) {
             // Failed, cleanup first.
-            $DB->delete_record('local_recyclebin', array(
+            $DB->delete_records('local_recyclebin', array(
                 'id' => $binid
             ));
 
