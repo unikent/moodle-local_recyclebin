@@ -52,20 +52,23 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
         ));
 
         $settingnode = $nav->find('categorysettings', null);
-    } else if ($context->contextlevel == \CONTEXT_COURSE) {
+    } else {
         // Only add this settings item on non-site course pages.
         if (!$PAGE->course || $PAGE->course->id == SITEID) {
             return null;
         }
 
+        // We might be in a mod page, etc.
+        $coursectx = \context_course::instance($PAGE->course->id);
+
         // Check we can view the recycle bin.
-        if (!has_capability('local/recyclebin:view_item', $context)) {
+        if (!has_capability('local/recyclebin:view_item', $coursectx)) {
             return null;
         }
 
-        $bin = new \local_recyclebin\course($context->instanceid);
+        $bin = new \local_recyclebin\course($coursectx->instanceid);
         $url = new moodle_url('/local/recyclebin/index.php', array(
-            'contextid' => $context->id
+            'contextid' => $coursectx->id
         ));
 
         $settingnode = $nav->find('courseadmin', navigation_node::TYPE_COURSE);
