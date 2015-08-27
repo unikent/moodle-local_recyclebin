@@ -30,26 +30,38 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_recyclebin', get_string('pluginname', 'local_recyclebin'));
     $ADMIN->add('localplugins', $settings);
 
+    $lifetimes = array(
+        0    => new lang_string('neverdelete', 'local_recyclebin'),
+        1000 => new lang_string('numdays', '', 1000),
+        365  => new lang_string('numdays', '', 365),
+        180  => new lang_string('numdays', '', 180),
+        150  => new lang_string('numdays', '', 150),
+        120  => new lang_string('numdays', '', 120),
+        90   => new lang_string('numdays', '', 90),
+        60   => new lang_string('numdays', '', 60),
+        35   => new lang_string('numdays', '', 35),
+        10   => new lang_string('numdays', '', 10),
+        5    => new lang_string('numdays', '', 5),
+        2    => new lang_string('numdays', '', 2)
+    );
+
     $settings->add(new admin_setting_configselect(
         'local_recyclebin/expiry',
         new lang_string('expiry', 'local_recyclebin'),
         new lang_string('expiry_desc', 'local_recyclebin'),
         0,
-        array(
-            0    => new lang_string('neverdelete', 'local_recyclebin'),
-            1000 => new lang_string('numdays', '', 1000),
-            365  => new lang_string('numdays', '', 365),
-            180  => new lang_string('numdays', '', 180),
-            150  => new lang_string('numdays', '', 150),
-            120  => new lang_string('numdays', '', 120),
-            90   => new lang_string('numdays', '', 90),
-            60   => new lang_string('numdays', '', 60),
-            35   => new lang_string('numdays', '', 35),
-            10   => new lang_string('numdays', '', 10),
-            5    => new lang_string('numdays', '', 5),
-            2    => new lang_string('numdays', '', 2)
-        )
+        $lifetimes
     ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_recyclebin/course_expiry',
+        new lang_string('course_expiry', 'local_recyclebin'),
+        new lang_string('course_expiry_desc', 'local_recyclebin'),
+        0,
+        $lifetimes
+    ));
+
+    unset($lifetimes);
 
     $settings->add(new admin_setting_configcheckbox(
         'local_recyclebin/autohide',

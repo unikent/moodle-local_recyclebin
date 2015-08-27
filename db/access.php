@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin capabilities
+ * Plugin capabilities.
  *
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-    'local/recyclebin:view' => array(
+    'local/recyclebin:view_item' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
@@ -35,7 +35,7 @@ $capabilities = array(
         )
     ),
 
-    'local/recyclebin:restore' => array(
+    'local/recyclebin:restore_item' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
@@ -44,7 +44,7 @@ $capabilities = array(
         )
     ),
 
-    'local/recyclebin:delete' => array(
+    'local/recyclebin:delete_item' => array(
         'captype' => 'write',
         'riskbitmask' => RISK_DATALOSS,
         'contextlevel' => CONTEXT_COURSE,
@@ -54,12 +54,27 @@ $capabilities = array(
         )
     ),
 
-    'local/recyclebin:empty' => array(
+    'local/recyclebin:view_course' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'local/recyclebin:restore_course' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'local/recyclebin:delete_course' => array(
         'captype' => 'write',
         'riskbitmask' => RISK_DATALOSS,
-        'contextlevel' => CONTEXT_COURSE,
+        'contextlevel' => CONTEXT_COURSECAT,
         'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     )
