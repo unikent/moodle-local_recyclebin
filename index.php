@@ -30,12 +30,7 @@ $action = optional_param('action', null, PARAM_ALPHA);
 
 $context = context::instance_by_id($contextid, MUST_EXIST);
 
-$capabilities = array(
-    'view' => '',
-    'restore' => '',
-    'delete' => ''
-);
-
+$capabilities = null;
 $description = '';
 
 // We could be a course or a category.
@@ -200,7 +195,7 @@ foreach ($items as $item) {
 
     // Build delete link.
     if ($candelete) {
-        $delete = new \moodle_url('/local/recyclebin/index.php', array(
+        $delete = new \moodle_url($PAGE->url, array(
             'contextid' => $contextid,
             'itemid' => $item->id,
             'action' => 'delete',
@@ -217,7 +212,7 @@ foreach ($items as $item) {
     if ($canrestore) {
         $restore = '';
         if ($context->contextlevel == \CONTEXT_COURSECAT || isset($modules[$item->module])) {
-            $restore = new \moodle_url('/local/recyclebin/index.php', array(
+            $restore = new \moodle_url($PAGE->url, array(
                 'contextid' => $contextid,
                 'itemid' => $item->id,
                 'action' => 'restore',
@@ -237,7 +232,7 @@ $table->print_html();
 
 // Empty recyclebin link.
 if ($candelete) {
-    $empty = new \moodle_url('/local/recyclebin/index.php', array(
+    $empty = new \moodle_url($PAGE->url, array(
         'contextid' => $contextid,
         'action' => 'empty',
         'sesskey' => sesskey()

@@ -40,6 +40,11 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
 
     // What context are we in?
     if ($context->contextlevel == \CONTEXT_COURSECAT) {
+        // Check we can view the recycle bin.
+        if (!has_capability('local/recyclebin:view_course', $context)) {
+            return null;
+        }
+
         // Add a link to the category recyclebin.
         $bin = new \local_recyclebin\category($context->instanceid);
         $url = new moodle_url('/local/recyclebin/index.php', array(
