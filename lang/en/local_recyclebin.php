@@ -27,8 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Recycle bin';
 $string['cleanrecyclebin'] = 'Clean recycle bin';
 
-$string['expiry'] = 'Item lifetime';
-$string['expiry_desc'] = 'How long should a deleted item remain in the recycle bin?';
+$string['expiry'] = 'Mod lifetime';
+$string['expiry_desc'] = 'How long should a deleted mod remain in the recycle bin?';
+
+$string['course_expiry'] = 'Course lifetime';
+$string['course_expiry_desc'] = 'How long should a deleted course remain in the recycle bin?';
 
 $string['autohide'] = 'Auto hide?';
 $string['autohide_desc'] = 'Automatically hides the recycle bin link when the bin is empty.';
