@@ -3,6 +3,7 @@ This plugin adds a "recycle bin" for course modules to Moodle.
 It requires a core hack.
 
 See plugin pages here: https://moodle.org/plugins/view/local_recyclebin
+
 See documentation here: https://docs.moodle.org/29/en/local/Recycle_bin
 
 ## Installation - course recyclebin
