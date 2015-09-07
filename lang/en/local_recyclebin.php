@@ -27,8 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Recycle bin';
 $string['cleanrecyclebin'] = 'Clean recycle bin';
 
-$string['expiry'] = 'Item lifetime';
-$string['expiry_desc'] = 'How long should a deleted activity remain in the recycle bin?';
+$string['expiry'] = 'Mod lifetime';
+$string['expiry_desc'] = 'How long should a deleted mod remain in the recycle bin?';
+
+$string['course_expiry'] = 'Course lifetime';
+$string['course_expiry_desc'] = 'How long should a deleted course remain in the recycle bin?';
 
 $string['autohide'] = 'Auto hide?';
 $string['autohide_desc'] = 'Automatically hides the recycle bin link when the bin is empty.';
@@ -37,10 +40,13 @@ $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
 $string['empty'] = 'Empty recycle bin';
 
-$string['recyclebin:view'] = 'View recycle bin items';
-$string['recyclebin:restore'] = 'Restore recycle bin items';
-$string['recyclebin:delete'] = 'Delete recycle bin items';
-$string['recyclebin:empty'] = 'Empty recycle bins';
+$string['recyclebin:view_item'] = 'View course recycle bin items';
+$string['recyclebin:restore_item'] = 'Restore course recycle bin items';
+$string['recyclebin:delete_item'] = 'Delete course recycle bin items';
+
+$string['recyclebin:view_course'] = 'View category recycle bin items';
+$string['recyclebin:restore_course'] = 'Restore category recycle bin items';
+$string['recyclebin:delete_course'] = 'Delete category recycle bin items';
 
 $string['alertrestored'] = '{$a->name} has been restored';
 $string['alertdeleted'] = '{$a->name} has been deleted';
@@ -54,9 +60,12 @@ $string['event_stored_description'] = 'Item stored with ID {$a->objectid}.';
 $string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
 $string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
 
-$string['description'] = 'Items that have been deleted from a course can be restored and will appear at the bottom of the section from which they were deleted.';
+$string['description_course'] = 'Items that have been deleted from a course can be restored if they are still in the recyclebin, and will appear at the bottom of the section from which they were deleted.';
+$string['description_coursecat'] = 'Items that have been deleted from a category can be restored if they are still in the recyclebin.';
 $string['descriptionexpiry'] = 'Contents will be permanently deleted after {$a} days.';
 
 $string['emptybin'] = 'There are no items in the recycle bin.';
 $string['emptyconfirm'] = 'Are you sure you want to delete all items in the recycle bin?';
-$string['deleteconfirm'] = 'Are you sure you want to delete the selected item in the recycle bin?';
+$string['deleteconfirm'] = 'Are you sure you want to delete the selected item from the recycle bin?';
+
+$string['invalidcontext'] = 'Invalid context supplied.';

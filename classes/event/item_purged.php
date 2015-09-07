@@ -39,7 +39,7 @@ class item_purged extends \core\event\base
      * Init method.
      */
     protected function init() {
-        $this->data['objecttable'] = 'local_recyclebin';
+        $this->data['objecttable'] = 'local_recyclebin_course';
         $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

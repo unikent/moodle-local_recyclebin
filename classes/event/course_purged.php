@@ -15,47 +15,52 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Recycle bin observers.
+ * Recycle bin events.
  *
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_recyclebin;
+namespace local_recyclebin\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Main class for the recycle bin.
+ * Event Class
  *
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Observer
+class course_purged extends \core\event\base
 {
     /**
-     * Course hook.
-     * Note: This is not actually a typical observer.
-     * There is no pre-course delete event, see README.
-     *
-     * @param \stdClass $course The course record.
+     * Init method.
      */
-    public static function pre_course_delete($course) {
-        $recyclebin = new \local_recyclebin\category($course->category);
-        $recyclebin->store_item($course);
+    protected function init() {
+        $this->data['objecttable'] = 'local_recyclebin_category';
+        $this->data['crud'] = 'd';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 
     /**
-     * Course module hook.
-     * Note: This is not actually a typical observer.
-     * There is no pre-cm event, see README.
+     * Returns localised general event name.
      *
-     * @param \stdClass $cm The course module record.
+     * @return string
      */
-    public static function pre_cm_delete($cm) {
-        $recyclebin = new \local_recyclebin\course($cm->course);
-        $recyclebin->store_item($cm);
+    public static function get_name() {
+        return get_string('event_purged_name', 'local_recyclebin');
+    }
+
+    /**
+     * Returns description of what happened.
+     *
+     * @return string
+     */
+    public function get_description() {
+        return get_string('event_purged_description', 'local_recyclebin', array(
+            'objectid' => $this->objectid
+        ));
     }
 }

@@ -2,8 +2,12 @@
 This plugin adds a "recycle bin" for course modules to Moodle.
 It requires a core hack.
 
-## Installation
-As there is no pre-cm-deleted event, you will need to add a line to '/course/lib.php' (function course_delete_module), right after the first "if()".
+See plugin pages here: https://moodle.org/plugins/view/local_recyclebin
+
+See documentation here: https://docs.moodle.org/29/en/local/Recycle_bin
+
+## Installation - course recyclebin
+As there is no "pre-cm-deleted" event, you will need to add a line to '/course/lib.php' (function course_delete_module), right after the first "if()".
 ```
 diff --git a/course/lib.php b/course/lib.php
 index e49bdf1..5f8d6e6 100644
@@ -21,5 +25,21 @@ index e49bdf1..5f8d6e6 100644
  
 ```
 
-## Menu
-![Image of Menu] (https://cloud.githubusercontent.com/assets/4242976/7748834/3c5cd14e-ffc0-11e4-8fea-4db5fa0319d9.png)
+## Installation - category recyclebin
+As there is no "pre-course-deleted" event, you will need to add a line to '/lib/moodlelib.php' (function delete_course), right after the second "if()".
+```
+diff --git a/lib/moodlelib.php b/lib/moodlelib.php
+index 456d0f1..aeb0853 100644
+--- a/lib/moodlelib.php
++++ b/lib/moodlelib.php
+@@ -4683,6 +4683,9 @@ function delete_course($courseorid, $showfeedback = true) {
+         return false;
+     }
+ 
++    // Notify the recycle bin plugin.
++    \local_recyclebin\Observer::pre_course_delete($course);
++
+     // Make the course completely empty.
+     remove_course_contents($courseid, $showfeedback);
+ 
+```
