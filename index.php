@@ -228,7 +228,7 @@ foreach ($items as $item) {
 }
 
 // Display the table now.
-$table->print_html();
+$table->finish_output();
 
 // Empty recyclebin link.
 if ($candelete) {
