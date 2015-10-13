@@ -50,7 +50,7 @@ class clean_recyclebin extends \core\task\scheduled_task {
         if ($lifetime > 0) {
             $deletefrom = time() - (86400 * $lifetime);
 
-            $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < ?', array($deletefrom), '', 'id');
+            $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < ?', array($deletefrom));
             foreach ($items as $item) {
                 mtrace("[RecycleBin] Deleting item {$item->id}...");
 
@@ -65,7 +65,7 @@ class clean_recyclebin extends \core\task\scheduled_task {
         if ($lifetime > 0) {
             $deletefrom = time() - (86400 * $lifetime);
 
-            $items = $DB->get_recordset_select('local_recyclebin_category', 'deleted < ?', array($deletefrom), '', 'id');
+            $items = $DB->get_recordset_select('local_recyclebin_category', 'deleted < ?', array($deletefrom));
             foreach ($items as $item) {
                 mtrace("[RecycleBin] Deleting course {$item->id}...");
 
