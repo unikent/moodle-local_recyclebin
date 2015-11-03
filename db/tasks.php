@@ -24,7 +24,16 @@
 
 $tasks = array(
     array(
-        'classname' => 'local_recyclebin\task\clean_recyclebin',
+        'classname' => 'local_recyclebin\task\cleanup_activities',
+        'blocking' => 0,
+        'minute' => '*/30',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+    array(
+        'classname' => 'local_recyclebin\task\cleanup_courses',
         'blocking' => 0,
         'minute' => '*/30',
         'hour' => '*',

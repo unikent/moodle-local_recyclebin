@@ -25,7 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Recycle bin';
-$string['cleanrecyclebin'] = 'Clean recycle bin';
+
+$string['cleancourserecyclebin'] = 'Clean course recycle bins';
+$string['cleancategoryrecyclebin'] = 'Clean category recycle bins';
 
 $string['expiry'] = 'Mod lifetime';
 $string['expiry_desc'] = 'How long should a deleted mod remain in the recycle bin?';

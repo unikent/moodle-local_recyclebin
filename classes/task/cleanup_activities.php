@@ -25,18 +25,18 @@
 namespace local_recyclebin\task;
 
 /**
- * This task deleted expired recyclebin items.
+ * This task deletes expired course recyclebin items.
  *
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class clean_recyclebin extends \core\task\scheduled_task {
+class cleanup_activities extends \core\task\scheduled_task {
     /**
      * Task name.
      */
     public function get_name() {
-        return get_string('cleanrecyclebin', 'local_recyclebin');
+        return get_string('cleancourserecyclebin', 'local_recyclebin');
     }
 
     /**
@@ -47,33 +47,18 @@ class clean_recyclebin extends \core\task\scheduled_task {
 
         // Delete mods.
         $lifetime = get_config('local_recyclebin', 'expiry');
-        if ($lifetime > 0) {
-            $deletefrom = time() - (86400 * $lifetime);
-
-            $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < ?', array($deletefrom));
-            foreach ($items as $item) {
-                mtrace("[RecycleBin] Deleting item {$item->id}...");
-
-                $bin = new \local_recyclebin\course($item->course);
-                $bin->delete_item($item);
-            }
-            $items->close();
+        if ($lifetime <= 0) {
+            return true;
         }
 
-        // Delete courses.
-        $lifetime = get_config('local_recyclebin', 'course_expiry');
-        if ($lifetime > 0) {
-            $deletefrom = time() - (86400 * $lifetime);
+        $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < ?', array(time() - (86400 * $lifetime)));
+        foreach ($items as $item) {
+            mtrace("[RecycleBin] Deleting item {$item->id}...");
 
-            $items = $DB->get_recordset_select('local_recyclebin_category', 'deleted < ?', array($deletefrom));
-            foreach ($items as $item) {
-                mtrace("[RecycleBin] Deleting course {$item->id}...");
-
-                $bin = new \local_recyclebin\category($item->category);
-                $bin->delete_item($item);
-            }
-            $items->close();
+            $bin = new \local_recyclebin\course($item->course);
+            $bin->delete_item($item);
         }
+        $items->close();
 
         return true;
     }
