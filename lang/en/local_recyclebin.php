@@ -40,7 +40,7 @@ $string['autohide_desc'] = 'Automatically hides the recycle bin link when the bi
 
 $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
-$string['empty'] = 'Empty recycle bin';
+$string['empty'] = 'Delete all';
 
 $string['recyclebin:view_item'] = 'View course recycle bin items';
 $string['recyclebin:restore_item'] = 'Restore course recycle bin items';
