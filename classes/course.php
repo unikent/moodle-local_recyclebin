@@ -245,10 +245,16 @@ class course extends recyclebin
             return;
         }
 
+        // The course might have been deleted, check we have a context.
+        $context = \context_course::instance($item->course, \IGNORE_MISSING);
+        if (!$context) {
+            return;
+        }
+
         // Fire event.
         $event = \local_recyclebin\event\item_purged::create(array(
             'objectid' => $item->id,
-            'context' => \context_course::instance($item->course)
+            'context' => $context
         ));
         $event->add_record_snapshot('local_recyclebin_course', $item);
         $event->trigger();
