@@ -34,72 +34,91 @@ defined('MOODLE_INTERNAL') || die();
 class local_recyclebin_category_tests extends \advanced_testcase
 {
     /**
-     * Run a bunch of tests to make sure we capture mods.
+     * Setup for each test.
      */
-    public function test_observer() {
-        global $DB, $CFG;
+    protected function setUp() {
+        global $DB;
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
-        $before = $DB->count_records('course');
+        $this->before = $DB->count_records('course');
+        $this->course = $this->getDataGenerator()->create_course();
+    }
 
-        $course = $this->getDataGenerator()->create_course();
+    /**
+     * Run a bunch of tests to make sure we capture courses.
+     */
+    public function test_observer() {
+        global $DB;
 
-        $this->assertEquals($before + 1, $DB->count_records('course'));
-        delete_course($course, false);
-        $this->assertEquals($before, $DB->count_records('course'));
+        $this->assertEquals($this->before + 1, $DB->count_records('course'));
+        delete_course($this->course, false);
+        $this->assertEquals($this->before, $DB->count_records('course'));
 
         // Try with the API.
-        $recyclebin = new \local_recyclebin\category($course->category);
+        $recyclebin = new \local_recyclebin\category($this->course->category);
         $this->assertEquals(1, count($recyclebin->get_items()));
     }
 
     /**
-     * Run a bunch of tests to make sure we can restore mods.
+     * Run a bunch of tests to make sure we can restore courses.
      */
     public function test_restore() {
-        global $DB, $CFG;
+        global $DB;
 
-        $this->resetAfterTest(true);
-        $this->setAdminUser();
+        delete_course($this->course, false);
+        $this->assertEquals($this->before, $DB->count_records('course'));
 
-        $before = $DB->count_records('course');
-
-        $course = $this->getDataGenerator()->create_course();
-        delete_course($course, false);
-        $this->assertEquals($before, $DB->count_records('course'));
-
-        $recyclebin = new \local_recyclebin\category($course->category);
+        $recyclebin = new \local_recyclebin\category($this->course->category);
         foreach ($recyclebin->get_items() as $item) {
             $recyclebin->restore_item($item);
         }
 
-        $this->assertEquals($before + 1, $DB->count_records('course'));
+        $this->assertEquals($this->before + 1, $DB->count_records('course'));
         $this->assertEquals(0, count($recyclebin->get_items()));
     }
 
     /**
-     * Run a bunch of tests to make sure we can purge mods.
+     * Run a bunch of tests to make sure we can purge courses.
      */
     public function test_purge() {
-        global $DB, $CFG;
+        global $DB;
 
-        $this->resetAfterTest(true);
-        $this->setAdminUser();
+        delete_course($this->course, false);
+        $this->assertEquals($this->before, $DB->count_records('course'));
 
-        $before = $DB->count_records('course');
-
-        $course = $this->getDataGenerator()->create_course();
-        delete_course($course, false);
-        $this->assertEquals($before, $DB->count_records('course'));
-
-        $recyclebin = new \local_recyclebin\category($course->category);
+        $recyclebin = new \local_recyclebin\category($this->course->category);
         foreach ($recyclebin->get_items() as $item) {
             $recyclebin->delete_item($item);
         }
 
-        $this->assertEquals($before, $DB->count_records('course'));
+        $this->assertEquals($this->before, $DB->count_records('course'));
+        $this->assertEquals(0, count($recyclebin->get_items()));
+    }
+
+    /**
+     * Test the cleanup/purge task.
+     */
+    public function test_purge_task() {
+        global $DB;
+
+        set_config('course_expiry', 1, 'local_recyclebin');
+
+        delete_course($this->course, false);
+        $this->assertEquals($this->before, $DB->count_records('course'));
+
+        // Set deleted date to the distant past.
+        $recyclebin = new \local_recyclebin\category($this->course->category);
+        foreach ($recyclebin->get_items() as $item) {
+            $item->deleted = 1;
+            $DB->update_record('local_recyclebin_category', $item);
+        }
+        // Execute cleanup task.
+        $task = new local_recyclebin\task\cleanup_courses();
+        $task->execute();
+
+        $this->assertEquals($this->before, $DB->count_records('course'));
         $this->assertEquals(0, count($recyclebin->get_items()));
     }
 }
