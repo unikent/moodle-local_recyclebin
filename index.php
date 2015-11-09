@@ -29,20 +29,15 @@ $contextid = required_param('contextid', PARAM_INT);
 $action = optional_param('action', null, PARAM_ALPHA);
 
 $context = context::instance_by_id($contextid, MUST_EXIST);
+$PAGE->set_context($context);
 
-$capabilities = null;
 $description = '';
 
 // We could be a course or a category.
 switch ($context->contextlevel) {
     case \CONTEXT_COURSE:
         require_login($context->instanceid);
-
-        $capabilities = array(
-            'view' => 'local/recyclebin:view_item',
-            'restore' => 'local/recyclebin:restore_item',
-            'delete' => 'local/recyclebin:delete_item'
-        );
+        require_capability('local/recyclebin:view_item', $context);
 
         $recyclebin = new \local_recyclebin\course($context->instanceid);
         $description = get_string('description_course', 'local_recyclebin');
@@ -50,13 +45,7 @@ switch ($context->contextlevel) {
 
     case \CONTEXT_COURSECAT:
         require_login();
-        $PAGE->set_context($context);
-
-        $capabilities = array(
-            'view' => 'local/recyclebin:view_course',
-            'restore' => 'local/recyclebin:restore_course',
-            'delete' => 'local/recyclebin:delete_course'
-        );
+        require_capability('local/recyclebin:view_course', $context);
 
         $recyclebin = new \local_recyclebin\category($context->instanceid);
         $description = get_string('description_coursecat', 'local_recyclebin');
@@ -66,8 +55,6 @@ switch ($context->contextlevel) {
         print_error('invalidcontext', 'local_recyclebin');
     break;
 }
-
-require_capability($capabilities['view'], $context);
 
 $PAGE->set_url('/local/recyclebin/index.php', array(
     'contextid' => $contextid
@@ -88,21 +75,26 @@ if (!empty($action)) {
     switch ($action) {
         // Restore it.
         case 'restore':
-            require_capability($capabilities['restore'], $context);
-            $recyclebin->restore_item($item);
-            redirect($PAGE->url, get_string('alertrestored', 'local_recyclebin', $item), 2);
+            if ($recyclebin->can_restore($item)) {
+                $recyclebin->restore_item($item);
+                redirect($PAGE->url, get_string('alertrestored', 'local_recyclebin', $item), 2);
+            } else {
+                print_error('nopermissions', 'error');
+            }
         break;
 
         // Delete it.
         case 'delete':
-            require_capability($capabilities['delete'], $context);
-            $recyclebin->delete_item($item);
-            redirect($PAGE->url, get_string('alertdeleted', 'local_recyclebin', $item), 2);
+            if ($recyclebin->can_delete($item)) {
+                $recyclebin->delete_item($item);
+                redirect($PAGE->url, get_string('alertdeleted', 'local_recyclebin', $item), 2);
+            } else {
+                print_error('nopermissions', 'error');
+            }
         break;
 
         // Empty it.
         case 'empty':
-            require_capability($capabilities['delete'], $context);
             $recyclebin->delete_all_items();
             redirect($PAGE->url, get_string('alertemptied', 'local_recyclebin'), 2);
         break;
@@ -136,31 +128,15 @@ if ($expiry > 0) {
 }
 echo $OUTPUT->box($description, 'generalbox descriptionbox');
 
-// Check permissions.
-$canrestore = has_capability($capabilities['restore'], $context);
-$candelete = has_capability($capabilities['delete'], $context);
-
-// Strings.
-$restorestr = get_string('restore');
-$deletestr = get_string('delete');
-
 // Define columns and headers.
 $firstcolstr = $context->contextlevel == \CONTEXT_COURSE ? 'activity' : 'course';
-$columns = array($firstcolstr, 'date');
+$columns = array($firstcolstr, 'date', 'restore', 'delete');
 $headers = array(
     get_string($firstcolstr),
-    get_string('deleted', 'local_recyclebin')
+    get_string('deleted', 'local_recyclebin'),
+    get_string('restore'),
+    get_string('delete')
 );
-
-if ($candelete) {
-    $columns[] = 'delete';
-    $headers[] = $deletestr;
-}
-
-if ($canrestore) {
-    $columns[] = 'restore';
-    $headers[] = $restorestr;
-}
 
 // Define a table.
 $table = new flexible_table('recyclebin');
@@ -177,6 +153,7 @@ if ($context->contextlevel == \CONTEXT_COURSE) {
 }
 
 // Add all the items to the table.
+$showempty = false;
 foreach ($items as $item) {
     $row = array();
 
@@ -193,23 +170,8 @@ foreach ($items as $item) {
     $row[] = $name;
     $row[] = userdate($item->deleted);
 
-    // Build delete link.
-    if ($candelete) {
-        $delete = new \moodle_url($PAGE->url, array(
-            'contextid' => $contextid,
-            'itemid' => $item->id,
-            'action' => 'delete',
-            'sesskey' => sesskey()
-        ));
-        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete',
-                get_string('delete'), '', array('class' => 'iconsmall')), null,
-                array('class' => 'action-icon recycle-bin-delete'));
-
-        $row[] = $delete;
-    }
-
     // Build restore link.
-    if ($canrestore) {
+    if ($recyclebin->can_restore($item)) {
         $restore = '';
         if ($context->contextlevel == \CONTEXT_COURSECAT || isset($modules[$item->module])) {
             $restore = new \moodle_url($PAGE->url, array(
@@ -222,6 +184,28 @@ foreach ($items as $item) {
         }
 
         $row[] = $restore;
+    } else {
+        // Show padlock.
+        $row[] = $OUTPUT->pix_icon('t/locked', get_string('locked', 'admin'), '', array('class' => 'iconsmall'));
+    }
+
+    // Build delete link.
+    if ($recyclebin->can_delete($item)) {
+        $showempty = true;
+        $delete = new \moodle_url($PAGE->url, array(
+            'contextid' => $contextid,
+            'itemid' => $item->id,
+            'action' => 'delete',
+            'sesskey' => sesskey()
+        ));
+        $delete = $OUTPUT->action_icon($delete, new pix_icon('t/delete',
+                get_string('delete'), '', array('class' => 'iconsmall')), null,
+                array('class' => 'action-icon recycle-bin-delete'));
+
+        $row[] = $delete;
+    } else {
+        // Show padlock.
+        $row[] = $OUTPUT->pix_icon('t/locked', get_string('locked', 'admin'), '', array('class' => 'iconsmall'));
     }
 
     $table->add_data($row);
@@ -231,7 +215,7 @@ foreach ($items as $item) {
 $table->finish_output();
 
 // Empty recyclebin link.
-if ($candelete) {
+if ($showempty) {
     $empty = new \moodle_url($PAGE->url, array(
         'contextid' => $contextid,
         'action' => 'empty',

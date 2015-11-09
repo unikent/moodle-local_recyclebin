@@ -84,7 +84,30 @@ abstract class recyclebin
         // Cleanup all items.
         $items = $this->get_items();
         foreach ($items as $item) {
-            $this->delete_item($item);
+            if ($this->can_delete($item)) {
+                $this->delete_item($item);
+            }
         }
     }
+
+    /**
+     * Can we view this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public abstract function can_view($item);
+
+    /**
+     * Can we restore this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public abstract function can_restore($item);
+
+    /**
+     * Can we delete this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public abstract function can_delete($item);
 }

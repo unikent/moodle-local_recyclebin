@@ -51,7 +51,17 @@ class cleanup_activities extends \core\task\scheduled_task {
             return true;
         }
 
-        $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < ?', array(time() - (86400 * $lifetime)));
+        // Protected mods are exempt.
+        $protected = get_config('local_recyclebin', 'protectedmods');
+        $protected = explode(',', $protected);
+        list($sql, $params) = $DB->get_in_or_equal($protected, SQL_PARAMS_NAMED, 'm', false);
+
+        // Add deleted param.
+        $params = is_array($params) ? $params : array();
+        $params['deleted'] = time() - (86400 * $lifetime);
+
+        // Delete items.
+        $items = $DB->get_recordset_select('local_recyclebin_course', 'deleted < :deleted AND module ' . $sql, $params);
         foreach ($items as $item) {
             mtrace("[RecycleBin] Deleting item {$item->id}...");
 
