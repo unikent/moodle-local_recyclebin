@@ -56,6 +56,10 @@ switch ($context->contextlevel) {
     break;
 }
 
+if (!$recyclebin::is_enabled()) {
+    print_error('notenabled', 'local_recyclebin');
+}
+
 $PAGE->set_url('/local/recyclebin/index.php', array(
     'contextid' => $contextid
 ));

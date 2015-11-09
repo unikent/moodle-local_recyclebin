@@ -47,7 +47,7 @@ class cleanup_courses extends \core\task\scheduled_task {
 
         // Delete courses.
         $lifetime = get_config('local_recyclebin', 'course_expiry');
-        if ($lifetime <= 0) {
+        if (!\local_recyclebin\category::is_enabled() || $lifetime <= 0) {
             return true;
         }
 

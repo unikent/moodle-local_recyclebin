@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Observer
+class observer
 {
     /**
      * Course hook.
@@ -43,8 +43,10 @@ class Observer
      * @param \stdClass $course The course record.
      */
     public static function pre_course_delete($course) {
-        $recyclebin = new \local_recyclebin\category($course->category);
-        $recyclebin->store_item($course);
+        if (\local_recyclebin\category::is_enabled()) {
+            $recyclebin = new \local_recyclebin\category($course->category);
+            $recyclebin->store_item($course);
+        }
     }
 
     /**
@@ -55,7 +57,9 @@ class Observer
      * @param \stdClass $cm The course module record.
      */
     public static function pre_cm_delete($cm) {
-        $recyclebin = new \local_recyclebin\course($cm->course);
-        $recyclebin->store_item($cm);
+        if (\local_recyclebin\course::is_enabled()) {
+            $recyclebin = new \local_recyclebin\course($cm->course);
+            $recyclebin->store_item($cm);
+        }
     }
 }

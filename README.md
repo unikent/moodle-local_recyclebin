@@ -18,7 +18,7 @@ index e49bdf1..5f8d6e6 100644
      }
  
 +    // Notify the recycle bin plugin.
-+    \local_recyclebin\Observer::pre_cm_delete($cm);
++    \local_recyclebin\observer::pre_cm_delete($cm);
 +
      // Get the module context.
      $modcontext = context_module::instance($cm->id);
@@ -37,7 +37,7 @@ index 456d0f1..aeb0853 100644
      }
  
 +    // Notify the recycle bin plugin.
-+    \local_recyclebin\Observer::pre_course_delete($course);
++    \local_recyclebin\observer::pre_course_delete($course);
 +
      // Make the course completely empty.
      remove_course_contents($courseid, $showfeedback);

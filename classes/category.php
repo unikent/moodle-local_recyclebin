@@ -47,6 +47,13 @@ class category extends recyclebin
     }
 
     /**
+     * Is this recyclebin enabled?
+     */
+    public static function is_enabled() {
+        return get_config('local_recyclebin', 'enablecategory');
+    }
+
+    /**
      * Returns an item from the recycle bin.
      *
      * @param $item int Item ID to retrieve.

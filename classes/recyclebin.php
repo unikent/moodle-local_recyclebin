@@ -36,6 +36,13 @@ defined('MOODLE_INTERNAL') || die();
 abstract class recyclebin
 {
     /**
+     * Is this recyclebin enabled?
+     */
+    public static function is_enabled() {
+        return false;
+    }
+
+    /**
      * Returns an item from the recycle bin.
      *
      * @param $item int Item ID to retrieve.
