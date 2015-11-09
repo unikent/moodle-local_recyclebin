@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Main class for the recycle bin.
  *
- * @since 2.2 Replaces Observer class.
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
