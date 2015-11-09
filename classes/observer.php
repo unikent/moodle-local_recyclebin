@@ -29,24 +29,23 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Main class for the recycle bin.
  *
- * @deprecated 2.2 Please use "observer" class instead (note lower case).
+ * @since 2.2 Replaces Observer class.
  * @package    local_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class Observer
+class observer
 {
     /**
      * Course hook.
      * Note: This is not actually a typical observer.
      * There is no pre-course delete event, see README.
      *
-     * @deprecated 2.2 Please use observer::pre_course_delete instead (note lower case).
      * @param \stdClass $course The course record.
      */
     public static function pre_course_delete($course) {
-        debugging("Observer::pre_course_delete is deprecated and will be removed in a future update.");
-        observer::pre_course_delete($course);
+        $recyclebin = new \local_recyclebin\category($course->category);
+        $recyclebin->store_item($course);
     }
 
     /**
@@ -54,11 +53,10 @@ class Observer
      * Note: This is not actually a typical observer.
      * There is no pre-cm event, see README.
      *
-     * @deprecated 2.2 Please use observer::pre_cm_delete instead (note lower case).
      * @param \stdClass $cm The course module record.
      */
     public static function pre_cm_delete($cm) {
-        debugging("Observer::pre_cm_delete is deprecated and will be removed in a future update.");
-        observer::pre_cm_delete($cm);
+        $recyclebin = new \local_recyclebin\course($cm->course);
+        $recyclebin->store_item($cm);
     }
 }
