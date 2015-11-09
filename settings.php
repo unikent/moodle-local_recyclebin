@@ -45,12 +45,27 @@ if ($hassiteconfig) {
         2    => new lang_string('numdays', '', 2)
     );
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_recyclebin/enablecourse',
+        new lang_string('enablecourse', 'local_recyclebin'),
+        new lang_string('enablecourse_desc', 'local_recyclebin'),
+        1
+    ));
+
     $settings->add(new admin_setting_configselect(
         'local_recyclebin/expiry',
         new lang_string('expiry', 'local_recyclebin'),
         new lang_string('expiry_desc', 'local_recyclebin'),
         0,
         $lifetimes
+    ));
+
+
+    $settings->add(new admin_setting_configcheckbox(
+        'local_recyclebin/enablecategory',
+        new lang_string('enablecategory', 'local_recyclebin'),
+        new lang_string('enablecategory_desc', 'local_recyclebin'),
+        1
     ));
 
     $settings->add(new admin_setting_configselect(

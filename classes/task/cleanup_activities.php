@@ -47,7 +47,7 @@ class cleanup_activities extends \core\task\scheduled_task {
 
         // Delete mods.
         $lifetime = get_config('local_recyclebin', 'expiry');
-        if ($lifetime <= 0) {
+        if (!\local_recyclebin\course::is_enabled() || $lifetime <= 0) {
             return true;
         }
 

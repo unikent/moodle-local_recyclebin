@@ -41,7 +41,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
     // What context are we in?
     if ($context->contextlevel == \CONTEXT_COURSECAT) {
         // Check we can view the recycle bin.
-        if (!has_capability('local/recyclebin:view_course', $context)) {
+        if (!has_capability('local/recyclebin:view_course', $context) || !\local_recyclebin\category::is_enabled()) {
             return null;
         }
 
@@ -54,7 +54,7 @@ function local_recyclebin_extend_settings_navigation(settings_navigation $nav, c
         $settingnode = $nav->find('categorysettings', null);
     } else {
         // Only add this settings item on non-site course pages.
-        if (!$PAGE->course || $PAGE->course->id == SITEID) {
+        if (!$PAGE->course || $PAGE->course->id == SITEID || !\local_recyclebin\course::is_enabled()) {
             return null;
         }
 

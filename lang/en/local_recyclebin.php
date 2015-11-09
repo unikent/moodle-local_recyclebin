@@ -29,8 +29,14 @@ $string['pluginname'] = 'Recycle bin';
 $string['cleancourserecyclebin'] = 'Clean course recycle bins';
 $string['cleancategoryrecyclebin'] = 'Clean category recycle bins';
 
-$string['expiry'] = 'Mod lifetime';
+$string['enablecourse'] = 'Enable course recyclebin';
+$string['enablecourse_desc'] = 'Enables or disables the course recyclebin';
+
+$string['expiry'] = 'Activity lifetime';
 $string['expiry_desc'] = 'How long should a deleted mod remain in the recycle bin?';
+
+$string['enablecategory'] = 'Enable category recyclebin';
+$string['enablecategory_desc'] = 'Enables or disables the category recyclebin';
 
 $string['course_expiry'] = 'Course lifetime';
 $string['course_expiry_desc'] = 'How long should a deleted course remain in the recycle bin?';
@@ -75,4 +81,5 @@ $string['emptyconfirm'] = 'Are you sure you want to delete all items in the recy
 $string['deleteconfirm'] = 'Are you sure you want to delete the selected item from the recycle bin?';
 
 $string['invalidcontext'] = 'Invalid context supplied.';
-$string['incorrectaccess'] = 'You do not have permission to do that!';
+
+$string['notenabled'] = 'Sorry, but the recycle bin has been disabled by the administrator.';
