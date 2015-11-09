@@ -241,6 +241,7 @@ class course extends recyclebin
             'id' => $item->id
         ));
 
+        // Return now if we don't need an event.
         if ($noevent) {
             return;
         }
@@ -258,5 +259,49 @@ class course extends recyclebin
         ));
         $event->add_record_snapshot('local_recyclebin_course', $item);
         $event->trigger();
+    }
+
+    /**
+     * Can we view this item?
+     *
+     * @param stdClass $item The item database record
+     */
+    public function can_view($item) {
+        $context = \context_course::instance($item->course);
+        return has_capability('local/recyclebin:view_item', $context);
+    }
+
+    /**
+     * Can we restore this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public function can_restore($item) {
+        $context = \context_course::instance($item->course);
+        return has_capability('local/recyclebin:restore_item', $context);
+    }
+
+    /**
+     * Can we delete this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public function can_delete($item) {
+        $context = \context_course::instance($item->course);
+
+        // Basic check - do we have the first require capability?
+        if (!has_capability('local/recyclebin:delete_item', $context)) {
+            return false;
+        }
+
+        // Are we a protected item?
+        $protected = get_config('local_recyclebin', 'protectedmods');
+        $protected = explode(',', $protected);
+        if (!in_array($item->module, $protected)) {
+            return true;
+        }
+
+        // Yes! Can we delete protected items?
+        return has_capability('local/recyclebin:delete_protected_item', $context);
     }
 }

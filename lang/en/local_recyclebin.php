@@ -38,6 +38,9 @@ $string['course_expiry_desc'] = 'How long should a deleted course remain in the 
 $string['autohide'] = 'Auto hide?';
 $string['autohide_desc'] = 'Automatically hides the recycle bin link when the bin is empty.';
 
+$string['protectedmods'] = 'Protected modules';
+$string['protectedmods_desc'] = 'Protected modules will not be automatically deleted.';
+
 $string['neverdelete'] = 'Never delete recycled items';
 $string['deleted'] = 'Date deleted';
 $string['empty'] = 'Delete all';
@@ -45,6 +48,7 @@ $string['empty'] = 'Delete all';
 $string['recyclebin:view_item'] = 'View course recycle bin items';
 $string['recyclebin:restore_item'] = 'Restore course recycle bin items';
 $string['recyclebin:delete_item'] = 'Delete course recycle bin items';
+$string['recyclebin:delete_protected_item'] = 'Delete protected course recycle bin items';
 
 $string['recyclebin:view_course'] = 'View category recycle bin items';
 $string['recyclebin:restore_course'] = 'Restore category recycle bin items';
@@ -71,3 +75,4 @@ $string['emptyconfirm'] = 'Are you sure you want to delete all items in the recy
 $string['deleteconfirm'] = 'Are you sure you want to delete the selected item from the recycle bin?';
 
 $string['invalidcontext'] = 'Invalid context supplied.';
+$string['incorrectaccess'] = 'You do not have permission to do that!';

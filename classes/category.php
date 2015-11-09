@@ -269,4 +269,34 @@ class category extends recyclebin
         $event->add_record_snapshot('local_recyclebin_category', $item);
         $event->trigger();
     }
+
+    /**
+     * Can we view this item?
+     *
+     * @param stdClass $item The item database record
+     */
+    public function can_view($item) {
+        $context = \context_coursecat::instance($item->category);
+        return has_capability('local/recyclebin:view_course', $context);
+    }
+
+    /**
+     * Can we restore this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public function can_restore($item) {
+        $context = \context_coursecat::instance($item->category);
+        return has_capability('local/recyclebin:restore_course', $context);
+    }
+
+    /**
+     * Can we delete this?
+     *
+     * @param stdClass $item The item database record
+     */
+    public function can_delete($item) {
+        $context = \context_coursecat::instance($item->category);
+        return has_capability('local/recyclebin:delete_course', $context);
+    }
 }
