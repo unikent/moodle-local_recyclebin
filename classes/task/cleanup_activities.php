@@ -51,14 +51,14 @@ class cleanup_activities extends \core\task\scheduled_task {
             return true;
         }
 
-        // Protected mods are exempt.
-        $protected = get_config('local_recyclebin', 'protectedmods');
-        $protected = explode(',', $protected);
-
         // Start building SQL.
         $sql = '';
         $params = array();
+
+        // Protected mods are exempt.
+        $protected = get_config('local_recyclebin', 'protectedmods');
         if (!empty($protected)) {
+            $protected = explode(',', $protected);
             list($sql, $params) = $DB->get_in_or_equal($protected, SQL_PARAMS_NAMED, 'm', false);
             $sql = " AND module {$sql}";
         }
