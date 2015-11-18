@@ -184,7 +184,9 @@ foreach ($items as $item) {
                 'action' => 'restore',
                 'sesskey' => sesskey()
             ));
-            $restore = $OUTPUT->action_icon($restore, new pix_icon('t/restore', get_string('restore'), '', array('class' => 'iconsmall')));
+            $restore = $OUTPUT->action_icon($restore, new pix_icon('t/restore', get_string('restore'), '', array(
+                'class' => 'iconsmall'
+            )));
         }
 
         $row[] = $restore;
