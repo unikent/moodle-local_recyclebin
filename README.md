@@ -1,4 +1,4 @@
-# Moodle Recycle Bin
+# Moodle Recycle Bin [![Build Status](https://travis-ci.org/unikent/moodle-local_recyclebin.svg)](https://travis-ci.org/unikent/moodle-local_recyclebin)
 This plugin adds a "recycle bin" for course modules to Moodle.
 It requires a core hack.
 
