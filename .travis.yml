@@ -36,8 +36,8 @@ before_install:
 
 install:
   - moodle-plugin-ci install
-  - sed -i .bak "s/\/\/ Get the module context./\\\\local_recyclebin\\\\observer::pre_cm_delete(\$cm);/g" /home/travis/build/moodle/course/lib.php
-  - sed -i .bak "s/\/\/ Make the course completely empty./\\\\local_recyclebin\\\\observer::pre_course_delete(\$course);/g" /home/travis/build/moodle/lib/moodlelib.php
+  - sed -i.bak "s/\/\/ Get the module context./\\\\local_recyclebin\\\\observer::pre_cm_delete(\$cm);/g" /home/travis/build/moodle/course/lib.php
+  - sed -i.bak "s/\/\/ Make the course completely empty./\\\\local_recyclebin\\\\observer::pre_course_delete(\$course);/g" /home/travis/build/moodle/lib/moodlelib.php
 
 script:
   - moodle-plugin-ci phplint
