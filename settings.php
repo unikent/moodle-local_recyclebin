@@ -89,7 +89,7 @@ if ($hassiteconfig) {
         'local_recyclebin/protectedmods',
         new lang_string('protectedmods', 'local_recyclebin'),
         new lang_string('protectedmods_desc', 'local_recyclebin'),
-        0,
+        array(),
         $DB->get_records_menu('modules', array('visible' => 1), 'name ASC', 'id, name')
     ));
 }
