@@ -44,7 +44,7 @@ function xmldb_local_recyclebin_upgrade($oldversion) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
             }
-    
+
             // Define index i_deleted (not unique) to be added to local_recyclebin.
             $index = new xmldb_index('i_deleted', XMLDB_INDEX_NOTUNIQUE, array('deleted'));
             // Conditionally launch add index i_deleted.
