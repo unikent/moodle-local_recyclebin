@@ -62,7 +62,9 @@ function xmldb_local_recyclebin_upgrade($oldversion) {
         $table = new xmldb_table('local_recyclebin');
 
         // Launch rename table for local_recyclebin.
-        $dbman->rename_table($table, 'local_recyclebin_course');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'local_recyclebin_course');
+        }
 
         // Recyclebin savepoint reached.
         upgrade_plugin_savepoint(true, 2015082700, 'local', 'recyclebin');
