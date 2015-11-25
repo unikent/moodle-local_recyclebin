@@ -38,20 +38,19 @@ function xmldb_local_recyclebin_upgrade($oldversion) {
     if ($oldversion < 2015060400) {
         // Define field deleted to be added to local_recyclebin.
         $table = new xmldb_table('local_recyclebin');
-        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'name');
+        if ($dbman->table_exists($table)) {
+            $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'name');
+            // Conditionally launch add field deleted.
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
 
-        // Conditionally launch add field deleted.
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        // Define index i_deleted (not unique) to be added to local_recyclebin.
-        $table = new xmldb_table('local_recyclebin');
-        $index = new xmldb_index('i_deleted', XMLDB_INDEX_NOTUNIQUE, array('deleted'));
-
-        // Conditionally launch add index i_deleted.
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
+            // Define index i_deleted (not unique) to be added to local_recyclebin.
+            $index = new xmldb_index('i_deleted', XMLDB_INDEX_NOTUNIQUE, array('deleted'));
+            // Conditionally launch add index i_deleted.
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
         }
 
         upgrade_plugin_savepoint(true, 2015060400, 'local', 'recyclebin');
@@ -62,7 +61,9 @@ function xmldb_local_recyclebin_upgrade($oldversion) {
         $table = new xmldb_table('local_recyclebin');
 
         // Launch rename table for local_recyclebin.
-        $dbman->rename_table($table, 'local_recyclebin_course');
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'local_recyclebin_course');
+        }
 
         // Recyclebin savepoint reached.
         upgrade_plugin_savepoint(true, 2015082700, 'local', 'recyclebin');
