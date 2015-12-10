@@ -40,6 +40,8 @@ if ($hassiteconfig) {
         90   => new lang_string('numdays', '', 90),
         60   => new lang_string('numdays', '', 60),
         35   => new lang_string('numdays', '', 35),
+        21   => new lang_string('numdays', '', 21),
+        14   => new lang_string('numdays', '', 14),
         10   => new lang_string('numdays', '', 10),
         5    => new lang_string('numdays', '', 5),
         2    => new lang_string('numdays', '', 2)
