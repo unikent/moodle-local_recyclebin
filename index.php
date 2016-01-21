@@ -175,21 +175,16 @@ foreach ($items as $item) {
     $row[] = userdate($item->deleted);
 
     // Build restore link.
-    if ($recyclebin->can_restore($item)) {
-        $restore = '';
-        if ($context->contextlevel == \CONTEXT_COURSECAT || isset($modules[$item->module])) {
-            $restore = new \moodle_url($PAGE->url, array(
-                'contextid' => $contextid,
-                'itemid' => $item->id,
-                'action' => 'restore',
-                'sesskey' => sesskey()
-            ));
-            $restore = $OUTPUT->action_icon($restore, new pix_icon('t/restore', get_string('restore'), '', array(
-                'class' => 'iconsmall'
-            )));
-        }
-
-        $row[] = $restore;
+    if ($recyclebin->can_restore($item) && ($context->contextlevel == \CONTEXT_COURSECAT || isset($modules[$item->module]))) {
+        $restoreurl = new \moodle_url($PAGE->url, array(
+            'contextid' => $contextid,
+            'itemid' => $item->id,
+            'action' => 'restore',
+            'sesskey' => sesskey()
+        ));
+        $row[] = $OUTPUT->action_icon($restoreurl, new pix_icon('t/restore', get_string('restore'), '', array(
+            'class' => 'iconsmall'
+        )));
     } else {
         // Show padlock.
         $row[] = $OUTPUT->pix_icon('t/locked', get_string('locked', 'admin'), '', array('class' => 'iconsmall'));
