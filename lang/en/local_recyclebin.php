@@ -29,14 +29,14 @@ $string['pluginname'] = 'Recycle bin';
 $string['cleancourserecyclebin'] = 'Clean course recycle bins';
 $string['cleancategoryrecyclebin'] = 'Clean category recycle bins';
 
-$string['enablecourse'] = 'Enable course recyclebin';
-$string['enablecourse_desc'] = 'Enables or disables the course recyclebin';
+$string['enablecourse'] = 'Enable course recycle bin';
+$string['enablecourse_desc'] = 'Enables or disables the course recycle bin';
 
 $string['expiry'] = 'Activity lifetime';
 $string['expiry_desc'] = 'How long should a deleted mod remain in the recycle bin?';
 
-$string['enablecategory'] = 'Enable category recyclebin';
-$string['enablecategory_desc'] = 'Enables or disables the category recyclebin';
+$string['enablecategory'] = 'Enable category recycle bin';
+$string['enablecategory_desc'] = 'Enables or disables the category recycle bin';
 
 $string['course_expiry'] = 'Course lifetime';
 $string['course_expiry_desc'] = 'How long should a deleted course remain in the recycle bin?';
@@ -72,8 +72,8 @@ $string['event_stored_description'] = 'Item stored with ID {$a->objectid}.';
 $string['event_restored_description'] = 'Item with ID {$a->objectid} restored.';
 $string['event_purged_description'] = 'Item with ID {$a->objectid} purged.';
 
-$string['description_course'] = 'Items that have been deleted from a course can be restored if they are still in the recyclebin, and will appear at the bottom of the section from which they were deleted.';
-$string['description_coursecat'] = 'Items that have been deleted from a category can be restored if they are still in the recyclebin.';
+$string['description_course'] = 'Items that have been deleted from a course can be restored if they are still in the recycle bin, and will appear at the bottom of the section from which they were deleted.';
+$string['description_coursecat'] = 'Items that have been deleted from a category can be restored if they are still in the recycle bin.';
 $string['descriptionexpiry'] = 'Contents will be permanently deleted after {$a} days.';
 
 $string['emptybin'] = 'There are no items in the recycle bin.';
