@@ -24,16 +24,18 @@ M.local_recyclebin = {
         }
 
         // Perform this action when any "Delete" button/link is clicked.
-        Y.all('.recycle-bin-delete').on('click', function(e) {
-            // Get some strings from the Recycle bin lang file.
-            var str = M.util.get_string('deleteconfirm', 'local_recyclebin');
+        Y.all('.recycle-bin-delete').each(function(node) {
+            node.on('click', function(e) {
+                // Get some strings from the Recycle bin lang file.
+                var str = M.util.get_string('deleteconfirm', 'local_recyclebin');
 
-            // Get the URL that leads to emptying the recycle bin.
-            var urldelete = this.get('href');
+                // Get the URL that leads to emptying the recycle bin.
+                var urldelete = this.get('href');
 
-            // Show the dialogue.
-            confirmDialogue(e, str, function() {
-                window.location = urldelete;
+                // Show the dialogue.
+                confirmDialogue(e, str, function() {
+                    window.location = urldelete;
+                });
             });
         });
 
