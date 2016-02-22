@@ -18,14 +18,14 @@
  * Defines the version.
  *
  * @package    local_recyclebin
- * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016010500;
+$plugin->version   = 2016022200;
 $plugin->component = 'local_recyclebin';
 $plugin->requires = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.2 (Build: 2016010500)';
+$plugin->release = '3.3 (Build: 2016022200)';
