@@ -1,10 +1,15 @@
 # Moodle Recycle Bin [![Build Status](https://travis-ci.org/unikent/moodle-local_recyclebin.svg)](https://travis-ci.org/unikent/moodle-local_recyclebin)
+
 This plugin adds a "recycle bin" for course modules to Moodle.
 It requires a core hack.
 
 See plugin pages here: https://moodle.org/plugins/view/local_recyclebin
 
 See documentation here: https://docs.moodle.org/29/en/local/Recycle_bin
+
+## Moodle 3.1
+Please note - this plugin has been merged into core for Moodle 3.1.
+If you have this installed you should run cli/migrate.php and then delete the plugin and remove the core hooks.
 
 ## Installation - course recyclebin
 As there is no "pre-cm-deleted" event, you will need to add a line to '/course/lib.php' (function course_delete_module), right after the first "if()".

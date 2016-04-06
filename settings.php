@@ -24,9 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $PAGE;
+global $CFG, $PAGE;
 
 if ($hassiteconfig) {
+    if (isset($CFG->version) && $CFG->version >= 2016033100) {
+        debugging("You are using the recyclebin plugin with Moodle 3.1!
+        This plugin has now been merged into core and should be removed, along with the hooks.");
+    }
+
     $settings = new admin_settingpage('local_recyclebin', get_string('pluginname', 'local_recyclebin'));
     $ADMIN->add('localplugins', $settings);
 
