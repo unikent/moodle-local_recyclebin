@@ -75,7 +75,37 @@ if ($count > 0) {
     cli_heading("Migrating {$count} course backups...");
     $rs = $DB->get_recordset('local_recyclebin_category');
     foreach ($rs as $record) {
+        $record->categoryid = $record->category;
+        $binid = $DB->insert_record('tool_recyclebin_category', $record);
 
+        // Create the location we want to copy this file to.
+        $filerecord = array(
+            'contextid' => \context_coursecat::instance($record->categoryid)->id,
+            'component' => 'tool_recyclebin',
+            'filearea' => TOOL_RECYCLEBIN_COURSECAT_BIN_FILEAREA,
+            'itemid' => $binid,
+            'filepath' => '/',
+            'filename' => $binid,
+            'timemodified' => time()
+        );
+
+        // Move the file over.
+        $currentloc = $CFG->dataroot . '/recyclebin/course-' . $record->id;
+        $fs = get_file_storage();
+        if (!file_exists($currentloc) || !$fs->create_file_from_pathname($filerecord, $currentloc)) {
+            $DB->delete_records('tool_recyclebin_category', array(
+                'id' => $binid
+            ));
+
+            cli_println("Failed to copy {$record->id}'s file to the new area.'");
+
+            continue;
+        }
+
+        // Delete our record.
+        $DB->delete_records('tool_recyclebin_category', array(
+            'id' => $record->id
+        ));
     }
     $rs->close();
 }
