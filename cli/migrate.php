@@ -36,6 +36,7 @@ if ($count > 0) {
     $rs = $DB->get_recordset('local_recyclebin_course');
     foreach ($rs as $record) {
         $record->courseid = $record->course;
+        $record->timecreated = $record->deleted;
         $binid = $DB->insert_record('tool_recyclebin_course', $record);
 
         // Create the location we want to copy this file to.
@@ -76,6 +77,7 @@ if ($count > 0) {
     $rs = $DB->get_recordset('local_recyclebin_category');
     foreach ($rs as $record) {
         $record->categoryid = $record->category;
+        $record->timecreated = $record->deleted;
         $binid = $DB->insert_record('tool_recyclebin_category', $record);
 
         // Create the location we want to copy this file to.
@@ -103,7 +105,7 @@ if ($count > 0) {
         }
 
         // Delete our record.
-        $DB->delete_records('tool_recyclebin_category', array(
+        $DB->delete_records('local_recyclebin_category', array(
             'id' => $record->id
         ));
     }
