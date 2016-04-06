@@ -23,7 +23,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
-if (!version_compare($CFG->release, '3.1.0', '>=')) {
+if ($CFG->version < 2016033100) {
     die("You must be on Moodle 3.1+ to use this script!");
 }
 
