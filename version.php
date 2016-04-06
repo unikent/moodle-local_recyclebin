@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016040600;
+$plugin->version   = 2016040601;
 $plugin->component = 'local_recyclebin';
 $plugin->requires = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.4 (Build: 2016040600)';
+$plugin->release = '3.5 (Build: 2016040601)';
